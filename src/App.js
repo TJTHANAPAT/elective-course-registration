@@ -5,17 +5,17 @@ import {
   Route,
 } from "react-router-dom";
 import CreateCourse from './CreateCourse'
+import Dashboard from './CourseDashboard';
 
 function App() {
   return (
     <Router>
       <Switch>
+        <Route path='/course'>
+          <Dashboard/>
+        </Route>
         <Route path='/createcourse'>
-          <div>
-            <h1>
-              <CreateCourse/>
-            </h1>
-          </div>
+          <CreateCourse/>
         </Route>
         <Route path='/'>
           <div>
