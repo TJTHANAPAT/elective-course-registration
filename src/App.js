@@ -6,11 +6,15 @@ import {
 } from "react-router-dom";
 import CreateCourse from './CreateCourse'
 import Dashboard from './CourseDashboard';
+import Enroll from './Enroll';
 
 function App() {
   return (
     <Router>
       <Switch>
+        <Route path='/course/enroll'>
+          <Enroll/>
+        </Route>
         <Route path='/course'>
           <Dashboard/>
         </Route>
