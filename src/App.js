@@ -7,11 +7,15 @@ import {
 import CreateCourse from './CreateCourse'
 import Dashboard from './CourseDashboard';
 import Enroll from './Enroll';
+import GetStudentData from './GetStudentData';
 
 function App() {
   return (
     <Router>
       <Switch>
+        <Route path='/search/'>
+          <GetStudentData/>
+        </Route>
         <Route path='/course/enroll'>
           <Enroll/>
         </Route>

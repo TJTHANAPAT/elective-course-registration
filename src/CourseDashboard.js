@@ -49,7 +49,7 @@ class Dashboard extends React.Component {
             }
             
             return (
-                <tr key={i}>
+                <tr key={i}> 
                     <td>
                         <b>{course.courseID} {course.courseName}</b><br/>
                         Teacher: {course.courseTeacher}<br/>
@@ -58,7 +58,7 @@ class Dashboard extends React.Component {
                     <td>{course.courseCapacity}</td>
                     <td>{course.courseEnrolled}</td>
                     <td>{courseStatus}</td>
-                    <td style={{textAlign:'center'}}><a href={btnLink} className={btnStyle} role="button" aria-disabled={btnDisabled}>{btnText}</a></td>
+                    <td style={{textAlign:'center'}}><a href={btnLink} style={{width:'70px'}} className={btnStyle} role="button" aria-disabled={btnDisabled}>{btnText}</a></td>
                 </tr>
             )
         })

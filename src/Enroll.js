@@ -63,7 +63,7 @@ class Enroll extends React.Component {
                 if (courseEnrolled < courseCapacity) {
                     courseRef.doc(courseID).get()
                         .then(course => {
-                            if (courseCapacity == course.data().courseCapacity) {
+                            if (courseCapacity === course.data().courseCapacity) {
                                 const {
                                     studentID, 
                                     firstName,
@@ -80,7 +80,7 @@ class Enroll extends React.Component {
                                     studentGrade: studentGrade,
                                     studentClass: studentClass,
                                     studentRoll: studentRoll,
-                                    selectedCourse: courseID
+                                    enrolledCourse: courseID
                                 }
                                 studentRef.doc(studentID).set(studentData)
                                     .then(() => {
