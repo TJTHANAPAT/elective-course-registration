@@ -6,11 +6,13 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
-    "firebase": "^7.13.2",
+    "firebase": "^7.14.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-neumorphic-toggle": "^1.0.1",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.4.1"
+    "react-scripts": "3.4.1",
+    "react-switch": "^5.0.1"
   },
   "scripts": {
     "start": "set PORT=7000 && react-scripts start",

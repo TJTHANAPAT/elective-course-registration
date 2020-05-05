@@ -8,6 +8,10 @@ import CreateCourse from './CreateCourse'
 import Dashboard from './CourseDashboard';
 import Enroll from './Enroll';
 import GetStudentData from './GetStudentData';
+import CourseManagement from './CourseManagement';
+import GradeConfig from './GradeConfig';
+import Homepage from './Homepage';
+import CourseYearConfig from './CourseYearConfig';
 
 function App() {
   return (
@@ -22,13 +26,20 @@ function App() {
         <Route path='/course'>
           <Dashboard/>
         </Route>
-        <Route path='/createcourse'>
+        <Route path='/admin/createcourse'>
           <CreateCourse/>
         </Route>
+        <Route path='/admin/system/config/year'>
+          <CourseYearConfig/>
+        </Route>
+        <Route path='/admin/config/grade'>
+          <GradeConfig/>
+        </Route>
+        <Route path='/admin'>
+          <CourseManagement/>
+        </Route>
         <Route path='/'>
-          <div>
-            <h1>Hello World!</h1>
-          </div>
+          <Homepage/>
         </Route>
       </Switch>
     </Router>

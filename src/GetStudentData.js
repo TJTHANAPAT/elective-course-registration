@@ -1,65 +1,133 @@
 import React from 'react';
-import firebase from 'firebase';
-import setupConfig from './setupConfig';
-const { courseYear } = setupConfig
+import firebase from 'firebase/app';
+import 'firebase/firestore';
+import LoadingPage from './Loading';
+import Footer from './Footer';
+import ErrorPage from './ErrorPage';
 
 class GetStudentData extends React.Component {
     state = {
         searchStudentID:'',
-
         studentID:'',
-        firstName:'',
-        lastName:'',
-        studentGrade:'',
-        studentClass:'',
-        studentRoll:'',
 
-        enrolledCourse:'',
-        courseName:'',
+        courseYearArr:[],
+        selectedCourseYear:'',
+        lastSearchCourseYear:'',
 
+        isSelectedCourseYearChange:false,
+        isLoadingComplete:false,
+        isLoadingData:false,
         isGetDataComplete:false,
+        isDataExists:false,
         alertMessage:''
     }
     componentDidMount = () => {
-        
+        this.getSystemConfig()
+            .then( res => {
+                const currentCourseYear = res.currentCourseYear;
+                const courseYearArr = res.courseYears;
+                this.setState({
+                    courseYearArr: courseYearArr,
+                    selectedCourseYear: currentCourseYear,
+                    isLoadingComplete: true
+                })
+            })
+            .catch( err => {
+                console.error(err);
+                this.setState({
+                    isLoadingComplete: true,
+                    isError: true,
+                    errorMessage: err
+                })
+            })
     }
+    
+    getSystemConfig = () => {
+        const db = firebase.firestore();
+        const configRef = db.collection('systemConfig').doc('config')
+        return new Promise ((resolve, reject) => {
+            configRef.get()
+                .then(doc => {
+                    if (!doc.exists) {
+                        const err = 'No system config has been initilized.'
+                        reject(err);
+                    } else {
+                        resolve(doc.data());
+                    }
+                })
+                .catch(err => {
+                    const errorMessage = 'Firebase Error.';
+                    reject(errorMessage);
+                    console.error(err);
+                })
+        })
+    }
+
     updateInputByID = (event) => {
         this.setState({
             [event.target.id]:event.target.value
         })
     }
 
+    selectCourseYear = (event) => {
+        const newSelectCourseYear = event.target.value;
+        this.setState({selectedCourseYear:newSelectCourseYear});
+    }
+
     searchStudentByID = (event) => {
         event.preventDefault();
-        const {searchStudentID, studentID} = this.state;
+        const {
+            searchStudentID,
+            studentID,
+            selectedCourseYear,
+            lastSearchCourseYear
+        } = this.state;
         const db = firebase.firestore();
-        const studentRef = db.collection(courseYear).doc('student').collection('student')
-        
-        if (searchStudentID !== studentID) {
+        const studentRef = db.collection(selectedCourseYear).doc('student').collection('student');
+        const courseRef = db.collection(selectedCourseYear).doc('course').collection('course');
+
+        if ((searchStudentID !== studentID) || (selectedCourseYear !== lastSearchCourseYear)) {
             this.setState({
                 isGetDataComplete: false,
-                alertMessage:'Loading...'
-            })
+                isLoadingData: true
+            });
             studentRef.doc(searchStudentID).get()
             .then(studentDoc => {
-                if(studentDoc.exists) {
-                    const {firstName, lastName, studentID, studentGrade, studentClass, studentRoll, enrolledCourse} = studentDoc.data();
-                    this.setState({
-                        studentID: studentID,
-                        firstName: firstName,
-                        lastName: lastName,
-                        studentGrade: studentGrade,
-                        studentClass: studentClass,
-                        studentRoll: studentRoll,
-                        enrolledCourse: enrolledCourse,
-                    })
-                    const courseRef = db.collection(courseYear).doc('course').collection('course')
+                if (studentDoc.exists) {
+                    const {
+                        nameTitle,
+                        nameFirst,
+                        nameLast,
+                        studentID,
+                        studentGrade,
+                        studentClass,
+                        studentRoll,
+                        enrolledCourse,
+                        timestamp
+                    } = studentDoc.data();
+                    
                     courseRef.doc(enrolledCourse).get()
                         .then(courseDoc => {
                             const {courseName} = courseDoc.data()
-                            this.setState({
+                            const studentData = {
+                                studentID: studentID,
+                                nameTitle: nameTitle,
+                                nameFirst: nameFirst,
+                                nameLast: nameLast,
+                                studentGrade: studentGrade,
+                                studentClass: studentClass,
+                                studentRoll: studentRoll,
+                                enrolledCourse: enrolledCourse,
                                 courseName: courseName,
+                                timestamp: new Date(timestamp.seconds*1000).toLocaleString()
+                            }
+                            this.setState({
+                                studentID: studentID,
+                                studentData: studentData,
+                                lastSearchCourseYear:selectedCourseYear,
+                                isLoadingData: false,
                                 isGetDataComplete: true,
+                                isDataExists: true,
                                 alertMessage:''
                             })
                         })
@@ -68,7 +136,14 @@ class GetStudentData extends React.Component {
                             this.setState({alertMessage:`Error: ${err}`})
                         })
                 } else {
-                    this.setState({alertMessage:`No student with ID ${searchStudentID} found in database! Please enroll to the course first.`})
+                    this.setState({
+                        isGetDataComplete: true,
+                        isLoadingData: false,
+                        isDataExists: false,
+                        studentID: searchStudentID,
+                        lastSearchCourseYear:selectedCourseYear,
+                        alertMessage:`No student with ID ${searchStudentID} found in database! Input studentID might be incorrect or haven't be enrolled in any course.`
+                    })
                 }
             })
             .catch(err => {
@@ -79,58 +154,97 @@ class GetStudentData extends React.Component {
         
     }
 
-    render(){
-        let data = () => {
-            return (<p>Hello</p>)
-        }
+    goBack = () => {
+        window.history.back();
+    }
+
+    studentData = () => {
         const {
-            searchStudentID,
-            isGetDataComplete,
-            firstName,
-            lastName,
+            studentData,
             studentID,
-            studentGrade,
-            studentClass,
-            studentRoll,
-            enrolledCourse,
-            courseName,
-            alertMessage
+            isLoadingData,
+            isGetDataComplete,
+            isDataExists
         } = this.state;
-        if(isGetDataComplete) {
+
+        if (isLoadingData) {
+            return <p><i className="fa fa-circle-o-notch fa-spin fa-fw"></i> Loading...</p>
+        } else if (isGetDataComplete && isDataExists) {
+            const {
+                nameTitle,
+                nameFirst,
+                nameLast,
+                studentID,
+                studentGrade,
+                studentClass,
+                studentRoll,
+                enrolledCourse,
+                courseName,
+                timestamp
+            } = studentData
             return (
-                <div className="wrapper">
-                    <h2>Search Your Data by StudentID</h2>
-                    <form onSubmit={this.searchStudentByID}>
-                        <div className="form-group">
-                            <input type="text" id="searchStudentID" className="form-control" onChange={this.updateInputByID} value={searchStudentID} placeholder="StudentID" required/>
-                        </div>
-                        <button type="submit" className="btn btn-primary">Search</button>
-                    </form>
-                    <br/>
+                <div>
+                    <h5>{nameFirst} {nameLast} ({studentID})</h5>
                     <p>
-                        Fullname: {firstName} {lastName} ({studentID})<br/>
+                        Fullname: {nameTitle} {nameFirst} {nameLast}<br/>
+                        Student ID: {studentID}<br/>
                         Grade: {studentGrade} Class: {studentClass} Roll: {studentRoll}<br/>
                         Enrolled Course: {enrolledCourse} {courseName}
                     </p>
-                    <p>{alertMessage}</p>
+                    <p><i>Enrolled since {timestamp}</i></p>
                 </div>
             )
-        } else {
+        } else if (isGetDataComplete) {
             return (
-                <div className="wrapper">
-                    <h2>Search Your Data by StudentID</h2>
-                    <form onSubmit={this.searchStudentByID}>
-                        <div className="form-group">
-                            <input type="text" id="searchStudentID" className="form-control" onChange={this.updateInputByID} value={searchStudentID} placeholder="StudentID" required/>
-                        </div>
-                        <button type="submit" className="btn btn-primary">Search</button>
-                    </form>
-                    <br/>
-                    <p>{alertMessage}</p>
+                <div>
+                    <h5>No student with ID {studentID} found in database!</h5>
+                    <p>Input student ID might be incorrect or haven't been enrolled in any course.</p>
                 </div>
             )
         }
-        
+    }
+
+    render() {
+        const {
+            isLoadingComplete,
+            isError,
+            errorMessage
+        } = this.state;
+        if (!isLoadingComplete) {
+            return <LoadingPage/>
+        } else if (isError) {
+            return <ErrorPage errorMessage={errorMessage} btn={'home'}/>
+        } else {
+            const {
+                searchStudentID,
+                courseYearArr,
+                selectedCourseYear
+            } = this.state;
+            const courseYearSelector = courseYearArr.map((courseYear, i) => {
+                return <option value={courseYear.year} key={i}>Course Year {courseYear.year}</option>
+            });
+            return (
+                <div className="body body-center bg-gradient">
+                    <div className="wrapper text-left">
+                        <h1>Search Your Data</h1>
+                        <p>Select course year and type your student ID.</p>
+                        <select className="form-control mb-3" defaultValue={selectedCourseYear} onChange={this.selectCourseYear}>
+                            {courseYearSelector}
+                        </select>
+                        <form onSubmit={this.searchStudentByID}>
+                            <div className="form-group">
+                                <input type="text" id="searchStudentID" className="form-control" onChange={this.updateInputByID} value={searchStudentID} placeholder="Student ID" required/>
+                            </div>
+                            <button type="submit" className="btn btn-purple">Search</button>
+                            <button onClick={this.goBack} className="btn btn-secondary ml-2">Back</button>
+                        </form>
+                        <br/>
+                        {this.studentData()}
+                    </div>
+                    <Footer/>
+                </div>
+            )
+        }
     }
 }
 

@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
-import firebase from 'firebase';
+import firebase from 'firebase/app';
 import firebaseConfig from './firebaseConfig';
 firebase.initializeApp(firebaseConfig);
 
