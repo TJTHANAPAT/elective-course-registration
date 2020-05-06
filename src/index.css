@@ -106,14 +106,50 @@ footer {
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
 }
+
+.admin.course .course-btn {
+  padding: 0;
+  padding-left: 10px;
+  display: flex;
+}
+.admin.course .btn.btn-admin {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0px;
+  padding: 10px;
+  font-size: 22px;
+}
+.admin.course .btn.btn-admin.btn-right {
+  border-radius: 0px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
 @media only screen and (max-width: 768px) {
   .course .course-btn {
-      padding: 0;
+    padding: 0;
   }
   .course .btn.btn-enroll {
-      border-radius: 0px;
-      border-bottom-left-radius: 10px;
-      border-bottom-right-radius: 10px;
+    border-radius: 0px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+  .admin.course .course-btn {
+    padding: 0;
+  }
+  .admin.course .btn.btn-admin {
+    font-size: 20px;
+  }
+  .admin.course .btn.btn-admin.btn-left {
+    border-radius: 0px;
+    border-bottom-left-radius: 10px;
+  }
+  .admin.course .btn.btn-admin.btn-right {
+    border-radius: 0px;
+    border-bottom-right-radius: 10px;
   }
 }
 

@@ -294,7 +294,7 @@ class CreateCourse extends React.Component {
                 </div>
                 <div className="form-group">
                     <label htmlFor="courseGrade">Course Grade</label><br/>
-                    <i>This course is available for students at which grade</i>
+                    <i>This course is available for students at</i>
                     {this.gradeSelector()}
                 </div>
                 

@@ -96,15 +96,16 @@ class CourseManagement extends React.Component {
         } else {
             let courseDashboard = coursesData.map((course, i) => {
                 let courseStatus = null;
-                let courseEditLink = `/admin/editcourse?courseYear=${courseYear}&courseID=${course.courseID}`
+                let courseEditLink = `/admin/editcourse?courseYear=${courseYear}&courseID=${course.courseID}`;
+                let courseViewLink = `/admin/viewcourse?courseYear=${courseYear}&courseID=${course.courseID}`;
                 if (course.courseEnrolled < course.courseCapacity) {
                     courseStatus = course.courseCapacity - course.courseEnrolled
                 } else {
                     courseStatus = 'Full'
                 }
                 return (
-                    <div className="course row" key={i}>
-                        <div className="col-md-10">
+                    <div className="course row admin" key={i}>
+                        <div className="col-md-9">
                             <div className="row align-items-center">
                                 <div className="detail col-sm-6">
                                     <span className="course-name">{course.courseID} {course.courseName}</span>
@@ -127,12 +128,11 @@ class CourseManagement extends React.Component {
                                         </div>
                                     </div>
                                 </div>
-                                
                             </div>
-                            
                         </div>
-                        <div className="course-btn col-md-2">
-                            <a className="btn btn-enroll btn-purple" href={courseEditLink}>Edit</a>
+                        <div className="course-btn col-md-3">
+                            <a className="col btn btn-admin btn-left btn-purple fa fa-file-text-o" href={courseViewLink}></a>
+                            <a className="col btn btn-admin btn-right btn-green fa fa-pencil" href={courseEditLink}></a>
                         </div>
                     </div>
                 )
