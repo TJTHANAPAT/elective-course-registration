@@ -5,7 +5,8 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 
 import firebase from 'firebase/app';
-import firebaseConfig from './firebaseConfig';
+// import firebaseConfig from './firebaseConfig';
+var firebaseConfig = require('./firebaseConfig/firebaseConfig.json');
 firebase.initializeApp(firebaseConfig);
 
 ReactDOM.render(
