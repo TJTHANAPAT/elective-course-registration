@@ -13,6 +13,7 @@ import GradeConfig from './GradeConfig';
 import Homepage from './Homepage';
 import CourseYearConfig from './CourseYearConfig';
 import EditCourse from './EditCourse';
+import ViewCourse from './ViewCourse';
 
 function App() {
   return (
@@ -29,6 +30,9 @@ function App() {
         </Route>
         <Route path='/admin/createcourse'>
           <CreateCourse/>
+        </Route>
+        <Route path='/admin/viewcourse'>
+          <ViewCourse/>
         </Route>
         <Route path='/admin/editcourse'>
           <EditCourse/>

@@ -104,7 +104,7 @@ class CreateCourse extends React.Component {
                     .then( doc => {
                         if (doc.exists) {
                             const gradesArr = doc.data().grades;
-                            if (gradesArr !== 0) {
+                            if (gradesArr.length !== 0) {
                                 resolve(gradesArr);
                             } else {
                                 const err = `No gradesArr of Course Year ${courseYear} has been found in database.`
@@ -281,12 +281,12 @@ class CreateCourse extends React.Component {
         return (
             <form onSubmit={this.createCourse}>
                 <div className="form-group">
-                    <label htmlFor="courseName">Course Name</label>
-                    <input type="text" className="form-control" id="courseName" placeholder="Course Name" onChange={this.updateInput} value={this.state.courseName} required/>
-                </div>
-                <div className="form-group">
                     <label htmlFor="courseID">Course ID</label>
                     <input type="text" className="form-control" id="courseID" placeholder="Course ID" onChange={this.updateInput} value={this.state.courseID} required/>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="courseName">Course Name</label>
+                    <input type="text" className="form-control" id="courseName" placeholder="Course Name" onChange={this.updateInput} value={this.state.courseName} required/>
                 </div>
                 <div className="form-group">
                     <label htmlFor="courseTeacher">Course Teacher</label>
