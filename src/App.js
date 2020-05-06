@@ -12,6 +12,7 @@ import CourseManagement from './CourseManagement';
 import GradeConfig from './GradeConfig';
 import Homepage from './Homepage';
 import CourseYearConfig from './CourseYearConfig';
+import EditCourse from './EditCourse';
 
 function App() {
   return (
@@ -28,6 +29,9 @@ function App() {
         </Route>
         <Route path='/admin/createcourse'>
           <CreateCourse/>
+        </Route>
+        <Route path='/admin/editcourse'>
+          <EditCourse/>
         </Route>
         <Route path='/admin/system/config/year'>
           <CourseYearConfig/>
