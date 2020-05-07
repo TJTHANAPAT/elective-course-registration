@@ -200,9 +200,11 @@ class CourseYearConfig extends React.Component {
                     }
                 }
                 return (
-                    <li className="list-group-item inline" key={i}>
-                        <span>Course Year {courseYear.year}</span>
-                        <div className="float-right flex-container">
+                    <li className="list-group-item" key={i}>
+                        <div className="list-item-text">
+                            <span>Course Year {courseYear.year}</span>
+                        </div>
+                        <div className="list-item-action-panel">
                             <Switch
                                 id={courseYear.year}
                                 onChange={this.handleChangeCourseYearAvailable}
@@ -216,7 +218,7 @@ class CourseYearConfig extends React.Component {
             })
             return (
                 <div>
-                    <ul className="list-group">{courseYearSelector}</ul>
+                    <ul className="list-group admin">{courseYearSelector}</ul>
                     <p className="mt-1">
                         <i>
                             Warning: Deleting a course year does not delete its course data 
@@ -233,14 +235,12 @@ class CourseYearConfig extends React.Component {
 
     addNewCourseYearForm = () => {
         return (
-            <form onSubmit={this.addNewCourseYear} className="mt-3">
-                <div className="form-config row">
-                    <div className="col-9 form-input-inline form-group">
-                        <input type="number" className="form-control" id="courseYearAdd" placeholder="Add new course year" onChange={this.updateInput} value={this.state.courseYearAdd} required/>
-                    </div>
-                    <div className="col-3 form-btn-inline">
-                        <button type="submit" className="btn btn-purple full-width">Add</button> 
-                    </div>
+            <form onSubmit={this.addNewCourseYear} className="form-config row mt-3">
+                <div className="col-9 form-input-inline form-group">
+                    <input type="number" className="form-control" id="courseYearAdd" placeholder="Add new course year" onChange={this.updateInput} value={this.state.courseYearAdd} required/>
+                </div>
+                <div className="col-3 form-btn-inline">
+                    <button type="submit" className="btn btn-purple full-width">Add</button> 
                 </div>
             </form>
         )

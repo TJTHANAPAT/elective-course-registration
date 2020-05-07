@@ -187,13 +187,17 @@ class GradeConfig extends React.Component {
         if (gradesArr.length !== 0) {
             let gradeList = gradesArr.map((grade, i) => {
                 return (
-                    <li className="list-group-item inline" key={i}>
-                        <span>Grade {grade}</span>
-                        <button className="btn btn-danger float-right fa fa-trash" onClick={this.removeGrade} value={grade}></button>
+                    <li className="list-group-item" key={i}>
+                        <div className="list-item-text">
+                            <span>Grade {grade}</span>
+                        </div>
+                        <div className="list-item-action-panel">
+                            <button className="btn btn-danger m-1 fa fa-trash" onClick={this.removeGrade} value={grade}></button>
+                        </div>
                     </li>
                 )
             })
-            return <ul className="list-group">{gradeList}</ul>
+            return <ul className="list-group admin">{gradeList}</ul>
         } else {
             return <p>No grade has been added.</p>
         }

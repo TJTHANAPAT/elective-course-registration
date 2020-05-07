@@ -3,12 +3,6 @@ html, body {
   padding: 0;
 }
 
-.flex-container {
-  display: flex;
-  align-items: center;
-}
-
-
 /*main element*/
 div.body {
   min-height: 100vh;
@@ -163,6 +157,19 @@ footer {
 }
 .form-config .form-btn-inline {
   padding: 0;
+}
+
+.admin li .list-item-text {
+  margin: 0;
+  float: left;
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+}
+.admin li .list-item-action-panel {
+  float: right;
+  display: flex;
+  align-items: center;
 }
 
 
