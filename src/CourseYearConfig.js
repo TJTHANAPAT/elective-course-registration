@@ -2,6 +2,9 @@ import React from 'react';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import Switch from 'react-switch';
+import LoadingPage from './Loading';
+import ErrorPage from './ErrorPage';
+import Footer from './Footer';
 
 class CourseYearConfig extends React.Component {
     state = {
@@ -11,25 +14,27 @@ class CourseYearConfig extends React.Component {
         currentCourseYear:'',
     }
     componentDidMount = () => {
-        const db = firebase.firestore();
-        const configRef = db.collection('systemConfig').doc('config')
-        configRef.get()
-            .then(doc => {
-                if(doc.exists){
+        this.getSystemConfig()
+            .then( res => {
+                const isFirstInitSystem = res.isFirstInitSystem;
+                if (!isFirstInitSystem) {
+                    const systemConfig = res.systemConfig;
                     this.setState({
-                        courseYearArr:doc.data().courseYears,
-                        currentCourseYear:doc.data().currentCourseYear
-                    })
-                    console.log(doc.data().courseYears)
+                        isLoadingComplete: true,
+                        currentCourseYear: systemConfig.currentCourseYear,
+                        courseYearArr: systemConfig.courseYears
+                    });
                 } else {
-                    this.setState({isFirstInit:true});
-                    console.error('No course year has ever been created.')
+                    console.warn('No course year config has ever been found in database. It will be initialized after saving.')
+                    this.setState({
+                        isLoadingComplete: true,
+                        isFirstInitSystem: true
+                    })
                 }
-                this.setState({isLoadingComplete: true})
-                
+                console.log(res);
             })
-            .catch(err => { 
-                console.error('Error: ', err)
+            .catch( err => {
+                console.error(err);
             })
 
         //add FontAwesome
@@ -43,6 +48,30 @@ class CourseYearConfig extends React.Component {
             [event.target.id]:event.target.value
         })
         console.log(event.target.id,':',event.target.value)
+    }
+
+    getSystemConfig = () => {
+        const db = firebase.firestore();
+        const configRef = db.collection('systemConfig').doc('config')
+        return new Promise ((resolve, reject) => {
+            configRef.get()
+                .then(doc => {
+                    if (!doc.exists) {
+                        console.warn('No system config has been initilized.');
+                        resolve({ isFirstInitSystem: true });
+                    } else {
+                        resolve({
+                            isFirstInitSystem: false,
+                            systemConfig: doc.data()
+                        });
+                    }
+                })
+                .catch(err => {
+                    const errorMessage = 'Firebase failed getting system config.';
+                    reject(errorMessage);
+                    console.error(err);
+                })
+        })
     }
 
     checkCourseYearExist = (courseYear) => {
@@ -94,7 +123,7 @@ class CourseYearConfig extends React.Component {
         for (let i = 0; i < courseYearArr.length; i++) {
             if ( courseYearArr[i].year === event.target.value) {
                 courseYearArr.splice(i, 1);
-                console.log('Remove Course Year ', event.target.value)
+                console.log('Remove Course Year', event.target.value)
             }
         }
         this.setState({TestArr:courseYearArr})
@@ -109,10 +138,10 @@ class CourseYearConfig extends React.Component {
         event.preventDefault();
         const db = firebase.firestore();
         const configRef = db.collection('systemConfig').doc('config')
-        const { courseYearArr, currentCourseYear, isFirstInit } = this.state;
+        const { courseYearArr, currentCourseYear, isFirstInitSystem } = this.state;
         if (currentCourseYear === '') {
-            alert('You have to set the current year.');
-        } else if (!isFirstInit) {
+            alert('You have to set the current course year.');
+        } else if (!isFirstInitSystem) {
             configRef.update({
                 courseYears:courseYearArr,
                 currentCourseYear:currentCourseYear
@@ -144,11 +173,6 @@ class CourseYearConfig extends React.Component {
         window.history.back();
     }
 
-    handleChange = (checked) => {
-        this.setState({ checked });
-        console.log(this.state.checked)
-    }
-
     handleChangeCourseYearAvailable = (checked, event, id) => {
         console.log(id)
         console.log(checked)
@@ -164,92 +188,85 @@ class CourseYearConfig extends React.Component {
         console.log(this.state.courseYearArr)
     }
 
+    courseYearList = () => {
+        const { courseYearArr, currentCourseYear } = this.state
+        if (courseYearArr.length !== 0) {
+            let courseYearSelector = courseYearArr.map((courseYear, i) => {
+                let btnCurrentYear = () => {
+                    if (currentCourseYear === courseYear.year) {
+                        return <button className="btn btn-success m-1 ml-2 fa fa-bookmark"></button>
+                    } else {
+                        return <button className="btn btn-light m-1 ml-2 fa fa-bookmark" onClick={this.setCurrentCourseYear} value={courseYear.year}></button>
+                    }
+                }
+                return (
+                    <li className="list-group-item inline" key={i}>
+                        <span>Course Year {courseYear.year}</span>
+                        <div className="float-right flex-container">
+                            <Switch
+                                id={courseYear.year}
+                                onChange={this.handleChangeCourseYearAvailable}
+                                checked={courseYear.available}
+                            />
+                            {btnCurrentYear()}
+                            <button className="btn btn-danger m-1 fa fa-trash" onClick={this.removeCourseYear} value={courseYear.year}></button>
+                        </div>
+                    </li>
+                )
+            })
+            return (
+                <div>
+                    <ul className="list-group">{courseYearSelector}</ul>
+                    <p className="mt-1">
+                        <i>
+                            Warning: Deleting a course year does not delete its course data 
+                            and student data in that course year! 
+                            To do that, you have to delete every course in that course year.
+                        </i>
+                    </p>
+                </div>
+            )
+        } else {
+            return <p>No course year has been added.</p>
+        }
+    }
+
+    addNewCourseYearForm = () => {
+        return (
+            <form onSubmit={this.addNewCourseYear} className="mt-3">
+                <div className="form-config row">
+                    <div className="col-9 form-input-inline form-group">
+                        <input type="number" className="form-control" id="courseYearAdd" placeholder="Add new course year" onChange={this.updateInput} value={this.state.courseYearAdd} required/>
+                    </div>
+                    <div className="col-3 form-btn-inline">
+                        <button type="submit" className="btn btn-purple full-width">Add</button> 
+                    </div>
+                </div>
+            </form>
+        )
+    }
+
 
     render(){
-        
-        if (this.state.isLoadingComplete) {
-            const {courseYearArr, currentCourseYear} = this.state
-            if (courseYearArr.length !== 0){
-                let courseYearSelector = courseYearArr.map((courseYear, i) => {
-                    if (currentCourseYear === courseYear.year) {
-                        return (
-                            <li className="list-group-item inline" key={i}>
-                                <span>Course Year {courseYear.year}</span>
-                                <div className="float-right flex-container">
-                                    <Switch
-                                        id={courseYear.year}
-                                        onChange={this.handleChangeCourseYearAvailable}
-                                        checked={courseYear.available}
-                                    />
-                                    <button className="btn btn-success m-1 fa fa-bookmark"></button>
-                                    <button className="btn btn-danger m-1 fa fa-trash" onClick={this.removeCourseYear} value={courseYear.year}></button>
-                                </div>
-                            </li>
-                        )
-                    } else {
-                        return (
-                            <li className="list-group-item inline" key={i}>
-                                <span>Course Year {courseYear.year}</span>
-                                <div className="float-right flex-container">
-                                    <Switch
-                                        id={courseYear.year}
-                                        onChange={this.handleChangeCourseYearAvailable}
-                                        checked={courseYear.available}
-                                    />
-                                    <button className="btn btn-light m-1 fa fa-bookmark" onClick={this.setCurrentCourseYear} value={courseYear.year}></button>
-                                    <button className="btn btn-danger m-1 fa fa-trash" onClick={this.removeCourseYear} value={courseYear.year}></button>
-                                </div>
-                            </li>
-                        )
-                    }
-                    
-                })
-                return (
-                    <div className="wrapper">
-                        <h1>
-                            Course Years Config
-                        </h1>
-                        <ul className="list-group">
-                            {courseYearSelector}
-                        </ul>
-                        
-                        <form onSubmit={this.addNewCourseYear} className="form-inline mt-2">
-                            <div className="form-group">
-                                <input type="number" className="form-control" id="courseYearAdd" placeholder="Add new course year" onChange={this.updateInput} value={this.state.courseYearAdd} required/>
-                            </div>
-                            <button type="submit" className="btn btn-primary ml-2">Add</button>
-                        </form>
-                        <button type="submit" className="btn btn-primary mt-2" onClick={this.save}>Save</button>
-                        <button onClick={this.goBack} className="btn btn-secondary mt-2 ml-2">Back</button>
-                        
-                    </div>
-                )
-            } else {
-                return (
-                    <div className="wrapper">
-                        <h1>
-                            Course Years Config
-                        </h1>
-                        <p>No Course Year has been added.</p>
-                        <form onSubmit={this.addNewCourseYear} className="form-inline">
-                            <div className="form-group">
-                                <input type="number" className="form-control" id="courseYearAdd" placeholder="Add new course year" onChange={this.updateInput} value={this.state.courseYearAdd} required/>
-                            </div>
-                            <button type="submit" className="btn btn-primary ml-2">Add</button>
-                        </form>
-                        <button onClick={this.goBack} className="btn btn-secondary mt-2">Back</button>
-                    </div>
-                )
-            }
+        const { isLoadingComplete, isError, errorMessage } = this.state;
+        if (!isLoadingComplete){
+            return <LoadingPage/>
+        } else if (isError) {
+            return <ErrorPage errorMessage={errorMessage} btn={'back'}/>
         } else {
             return (
-                <div className="wrapper">
-                        <h1>
-                            Course Years Config
-                        </h1>
-                        <p>Loading...</p>
-                        <button onClick={this.goBack} className="btn btn-secondary mt-2">Back</button>
+                <div className="body bg-gradient">
+                    <div className="wrapper">
+                        <h1>Course Years Configuration</h1>
+                        {this.courseYearList()}
+                        {this.addNewCourseYearForm()}
+                        <div className="mt-2">
+                            <button type="submit" className="btn btn-purple" onClick={this.save}>Save</button>
+                            <button onClick={this.goBack} className="btn btn-secondary ml-2">Back</button>
+                        </div>
                     </div>
+                    <Footer/>
+                </div>
             )
         }
     }
