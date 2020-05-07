@@ -53,6 +53,55 @@ class ViewCourse extends React.Component {
             })
     }
 
+    convertToCSV = (objectArr) => {
+        const array = [Object.keys(objectArr[0])].concat(objectArr)
+        return array.map(it => {
+            return Object.values(it).toString()
+        }).join('\n')
+    }
+    
+    exportCSVFile = (objectArr, fileTitle) => {
+        var csv = this.convertToCSV(objectArr);
+        var exportedFilenmae = fileTitle + '.csv' || 'export.csv';
+    
+        var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        if (navigator.msSaveBlob) { // IE 10+
+            navigator.msSaveBlob(blob, exportedFilenmae);
+        } else {
+            var link = document.createElement("a");
+            if (link.download !== undefined) { // feature detection
+                // Browsers that support HTML5 download attribute
+                var url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", exportedFilenmae);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+    }
+
+    exportStudentList = (event) => {
+        event.preventDefault();
+        const { studentsArr, courseYear, courseID } = this.state;
+        let fileTitle = `${courseYear}_${courseID}`;
+        let studentsArrFormated = [];
+        studentsArr.map(student => {
+            let studentDataFormated = {
+                StudentID: student.studentID,
+                Title: student.nameTitle,
+                FirstName: student.nameFirst,
+                LastName: student.nameLast,
+                Grade: student.studentGrade,
+                Class: student.studentClass,
+                Roll: student.studentRoll
+            }
+            studentsArrFormated.push(studentDataFormated);
+        })
+        this.exportCSVFile(studentsArrFormated, fileTitle);
+    } 
+
     updateInput = (event) => {
         this.setState({
           [event.target.id]: event.target.value
@@ -113,7 +162,7 @@ class ViewCourse extends React.Component {
                 })
                 .catch( err => {
                     console.error(err);
-                    const errorMessage = `Firebase failed getting student data of course ${courseID} in ${courseYear}.`
+                    const errorMessage = `Firebase failed getting student data of course ${courseID} in ${courseYear}. (${err.errorMessage})`
                     reject(errorMessage)
                 })
         })
@@ -137,21 +186,25 @@ class ViewCourse extends React.Component {
                 )
             })
             return (
-                <table className="table table-hover table-responsive-md">
-                    <thead>
-                        <tr>
-                            <th scope="col-1">ID</th>
-                            <th scope="col-1">Title</th>
-                            <th scope="col-4">First</th>
-                            <th scope="col-4">Last</th>
-                            <th scope="col-1">Grade/Class</th>
-                            <th scope="col-1">Roll</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {studentsList}
-                    </tbody>
-                </table>
+                <div>
+                    <table className="table table-hover table-responsive-md">
+                        <thead>
+                            <tr>
+                                <th scope="col-1">ID</th>
+                                <th scope="col-1">Title</th>
+                                <th scope="col-4">First</th>
+                                <th scope="col-4">Last</th>
+                                <th scope="col-1">Grade/Class</th>
+                                <th scope="col-1">Roll</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {studentsList}
+                        </tbody>
+                    </table>
+                    <button className="btn btn-purple" onClick={this.exportStudentList}><i className="fa fa-download fa-fw"></i> Export to CSV File</button>
+                </div>
+                
             )
         }
     }
