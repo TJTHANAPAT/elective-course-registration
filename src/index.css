@@ -28,6 +28,10 @@ div.wrapper {
   background-color: #ffffff;
   border-radius: 10px;
 }
+div.wrapper.login-form {
+  padding: 60px 20px;
+  max-width: 400px;
+}
 div.wrapper-no-bg-color {
   max-width: 800px;
   margin: auto;

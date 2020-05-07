@@ -8,7 +8,7 @@ import CreateCourse from './CreateCourse'
 import Dashboard from './CourseDashboard';
 import Enroll from './Enroll';
 import GetStudentData from './GetStudentData';
-import CourseManagement from './CourseManagement';
+import Admin from './Admin';
 import GradeConfig from './GradeConfig';
 import Homepage from './Homepage';
 import CourseYearConfig from './CourseYearConfig';
@@ -44,7 +44,7 @@ function App() {
           <GradeConfig/>
         </Route>
         <Route path='/admin'>
-          <CourseManagement/>
+          <Admin/>
         </Route>
         <Route path='/'>
           <Homepage/>

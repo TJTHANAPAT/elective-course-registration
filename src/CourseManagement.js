@@ -1,9 +1,13 @@
 import React from 'react';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
+import 'firebase/auth';
 import LoadingPage from './Loading';
 import ErrorPage from './ErrorPage';
 import Footer from './Footer';
+import Admin from './Admin';
+
+import * as auth from './authenticationFuctions';
 
 class CourseManagement extends React.Component {
     state = {
@@ -19,7 +23,16 @@ class CourseManagement extends React.Component {
     }
 
     componentDidMount = () => {
-        this.getSystemConfig()
+        auth.checkAuthState()
+            .then( res => {
+                const user = res.user;
+                const isLogin = res.isLogin;
+                this.setState({
+                    currentUser: user,
+                    isLogin: isLogin,
+                })
+                return this.getSystemConfig()
+            })
             .then( res => {
                 const isFirstInitSystem = res.isFirstInitSystem;
                 if (!isFirstInitSystem) {
@@ -44,6 +57,18 @@ class CourseManagement extends React.Component {
                     errorMessage: err
                 })
             })
+    }
+
+    logout = event => {
+        event.preventDefault()
+        auth.signOut()
+            .then( () => {
+                this.setState({
+                    currentUser: null,
+                    isLogin: false,
+                })
+            })
+        console.log('Signed out!')
     }
 
     getSystemConfig = () => {
@@ -151,13 +176,13 @@ class CourseManagement extends React.Component {
     }
 
     render(){
-        const {isLoadingComplete, isFirstInitSystem, isError, errorMessage } = this.state;
+        const {isLoadingComplete, isLogin, isFirstInitSystem, isError, errorMessage } = this.state;
         
         if (!isLoadingComplete){
             return <LoadingPage/>
         } else if (isError) {
             return <ErrorPage errorMessage={errorMessage} btn={'none'}/>
-        } else {
+        } else if (isLogin) {
             const { courses, courseYearArr, selectedCourseYear } = this.state;
             const courseDashboard = this.courseDashboard;
             if (isFirstInitSystem) {
@@ -180,7 +205,7 @@ class CourseManagement extends React.Component {
                     <div className="body bg-gradient">
                         <div className="wrapper">
                             <h1>Elective Course Enrollment System</h1>
-                            <h2>System Configuration</h2>
+                            <h2>System Management</h2>
                             <label htmlFor="courseyear-selector">Select course year which you want to config:</label>
                             <select id="courseyear-selector" className="form-control form-control-lg" defaultValue={selectedCourseYear} onChange={this.selectCourseYear}>
                                 {courseYearSelector}
@@ -192,6 +217,7 @@ class CourseManagement extends React.Component {
                             </div>
                             <hr/>
                             <div>
+                                <button className="btn btn-green m-1" onClick={this.logout}><i className="fa fa-sign-out"></i> Logout</button>
                                 <a role="button" className="btn btn-green m-1" href="/admin/system/config/year">Config Course Years</a>
                             </div>
                         </div>
@@ -201,6 +227,8 @@ class CourseManagement extends React.Component {
                 )
                 
             }
+        } else {
+            return <Admin/>
         }
         
     }
