@@ -5,7 +5,7 @@ import LoadingPage from '../components/LoadingPage';
 import Footer from '../components/Footer';
 import ErrorPage from '../components/ErrorPage';
 import * as auth from './functions/authenticationFuctions';
-import * as system from '../systemFunction';
+import * as system from '../systemFunctions';
 
 class GradeConfig extends React.Component {
     state = {

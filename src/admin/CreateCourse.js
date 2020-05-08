@@ -5,7 +5,7 @@ import Footer from '../components/Footer';
 import ErrorPage from '../components/ErrorPage';
 
 import * as auth from './functions/authenticationFuctions';
-import * as system from '../systemFunction';
+import * as system from '../systemFunctions';
 import createCourse from './functions/createCourseFunction';
 
 class CreateCourse extends React.Component {

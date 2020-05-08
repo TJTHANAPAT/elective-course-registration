@@ -8,7 +8,7 @@ import ErrorPage from '../components/ErrorPage';
 import Admin from './Admin';
 
 import * as auth from './functions/authenticationFuctions';
-import * as admin from '../systemFunction';
+import * as admin from '../systemFunctions';
 
 class CourseManagement extends React.Component {
     state = {
