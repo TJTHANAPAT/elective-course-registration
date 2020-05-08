@@ -1,7 +1,7 @@
 import React from 'react';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
-import LoadingPage from './Loading';
+import LoadingPage from './LoadingPage';
 import Footer from './Footer';
 import ErrorPage from './ErrorPage';
 

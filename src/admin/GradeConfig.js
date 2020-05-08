@@ -1,11 +1,11 @@
 import React from 'react';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
-import LoadingPage from './Loading';
-import ErrorPage from './ErrorPage';
-import Footer from './Footer';
-import * as auth from './authenticationFuctions';
-import * as system from './systemFunction';
+import LoadingPage from '../LoadingPage';
+import ErrorPage from '../ErrorPage';
+import Footer from '../Footer';
+import * as auth from './functions/authenticationFuctions';
+import * as system from '../systemFunction';
 
 class GradeConfig extends React.Component {
     state = {

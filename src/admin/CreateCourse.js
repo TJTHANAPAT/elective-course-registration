@@ -1,13 +1,13 @@
 import React from 'react';
 import 'firebase/firestore';
 
-import LoadingPage from './Loading';
-import Footer from './Footer';
-import ErrorPage from './ErrorPage';
+import LoadingPage from '../LoadingPage';
+import Footer from '../Footer';
+import ErrorPage from '../ErrorPage';
 
-import * as auth from './authenticationFuctions';
-import * as system from './systemFunction';
-import createCourse from './createCourseFunction';
+import * as auth from './functions/authenticationFuctions';
+import * as system from '../systemFunction';
+import createCourse from './functions/createCourseFunction';
 
 class CreateCourse extends React.Component {
     state = {

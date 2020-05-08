@@ -1,6 +1,6 @@
 import React from 'react';
 import Footer from './Footer';
-import LoadingPage from './Loading';
+import LoadingPage from './LoadingPage';
 import ErrorPage from './ErrorPage';
 import * as system from './systemFunction';
 import * as enroll from './enrollCourseFunction';

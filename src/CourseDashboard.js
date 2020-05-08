@@ -2,7 +2,7 @@ import React from 'react';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 
-import LoadingPage from './Loading';
+import LoadingPage from './LoadingPage';
 import ErrorPage from './ErrorPage';
 import Footer from './Footer';
 

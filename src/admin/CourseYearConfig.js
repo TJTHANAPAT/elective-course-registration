@@ -2,12 +2,12 @@ import React from 'react';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import Switch from 'react-switch';
-import LoadingPage from './Loading';
-import ErrorPage from './ErrorPage';
-import Footer from './Footer';
+import LoadingPage from '../LoadingPage';
+import ErrorPage from '../ErrorPage';
+import Footer from '../Footer';
 
-import * as auth from './authenticationFuctions';
-import * as system from './systemFunction';
+import * as auth from './functions/authenticationFuctions';
+import * as system from '../systemFunction';
 
 class CourseYearConfig extends React.Component {
     state = {

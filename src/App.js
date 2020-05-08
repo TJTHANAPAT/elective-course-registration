@@ -4,17 +4,20 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
-import CreateCourse from './CreateCourse'
+
 import Dashboard from './CourseDashboard';
 import Enroll from './Enroll';
 import GetStudentData from './GetStudentData';
-import Admin from './Admin';
-import GradeConfig from './GradeConfig';
 import Homepage from './Homepage';
-import CourseYearConfig from './CourseYearConfig';
-import EditCourse from './EditCourse';
-import ViewCourse from './ViewCourse';
-import CourseManagement from './CourseManagement';
+
+import Admin from './admin/Admin';
+import CourseManagement from './admin/CourseManagement';
+import CourseYearConfig from './admin/CourseYearConfig';
+import GradeConfig from './admin/GradeConfig';
+import CreateCourse from './admin/CreateCourse';
+import EditCourse from './admin/EditCourse';
+import ViewCourse from './admin/ViewCourse';
+
 
 function App() {
   return (

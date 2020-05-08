@@ -1,9 +1,9 @@
 import React from 'react';
-import LoadingPage from './Loading';
-import Footer from './Footer';
-import ErrorPage from './ErrorPage';
+import LoadingPage from '../LoadingPage';
+import Footer from '../Footer';
+import ErrorPage from '../ErrorPage';
 import CourseManagement from './CourseManagement';
-import * as auth from './authenticationFuctions';
+import * as auth from './functions/authenticationFuctions';
 
 class Admin extends React.Component {
 

@@ -2,13 +2,13 @@ import React from 'react';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/auth';
-import LoadingPage from './Loading';
-import ErrorPage from './ErrorPage';
-import Footer from './Footer';
+import LoadingPage from '../LoadingPage';
+import ErrorPage from '../ErrorPage';
+import Footer from '../Footer';
 import Admin from './Admin';
 
-import * as auth from './authenticationFuctions';
-import * as admin from './systemFunction';
+import * as auth from './functions/authenticationFuctions';
+import * as admin from '../systemFunction';
 
 class CourseManagement extends React.Component {
     state = {
