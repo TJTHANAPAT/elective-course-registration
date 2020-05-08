@@ -14,6 +14,7 @@ import Homepage from './Homepage';
 import CourseYearConfig from './CourseYearConfig';
 import EditCourse from './EditCourse';
 import ViewCourse from './ViewCourse';
+import CourseManagement from './CourseManagement';
 
 function App() {
   return (
@@ -42,6 +43,9 @@ function App() {
         </Route>
         <Route path='/admin/config/grade'>
           <GradeConfig/>
+        </Route>
+        <Route path='/admin/course'>
+          <CourseManagement/>
         </Route>
         <Route path='/admin'>
           <Admin/>

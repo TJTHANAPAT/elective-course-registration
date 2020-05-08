@@ -8,6 +8,7 @@ import Footer from './Footer';
 import Admin from './Admin';
 
 import * as auth from './authenticationFuctions';
+import * as admin from './adminFunctions';
 
 class CourseManagement extends React.Component {
     state = {
@@ -31,7 +32,7 @@ class CourseManagement extends React.Component {
                     currentUser: user,
                     isLogin: isLogin,
                 })
-                return this.getSystemConfig()
+                return admin.getSystemConfig(false)
             })
             .then( res => {
                 const isFirstInitSystem = res.isFirstInitSystem;
@@ -58,42 +59,7 @@ class CourseManagement extends React.Component {
                 })
             })
     }
-
-    logout = event => {
-        event.preventDefault()
-        auth.signOut()
-            .then( () => {
-                this.setState({
-                    currentUser: null,
-                    isLogin: false,
-                })
-            })
-        console.log('Signed out!')
-    }
-
-    getSystemConfig = () => {
-        const db = firebase.firestore();
-        const configRef = db.collection('systemConfig').doc('config')
-        return new Promise ((resolve, reject) => {
-            configRef.get()
-                .then(doc => {
-                    if (!doc.exists) {
-                        console.warn('No system config has been initilized.');
-                        resolve({ isFirstInitSystem: true });
-                    } else {
-                        resolve({
-                            isFirstInitSystem: false,
-                            systemConfig: doc.data()
-                        });
-                    }
-                })
-                .catch(err => {
-                    const errorMessage = 'Firebase failed getting system config.';
-                    reject(errorMessage);
-                    console.error(err);
-                })
-        })
-    }
+    
     getCoursesData = (courseYear) => {
         const db = firebase.firestore();
         const courseRef = db.collection(courseYear).doc('course').collection('course');
@@ -128,6 +94,14 @@ class CourseManagement extends React.Component {
                 } else {
                     courseStatus = 'Full'
                 }
+                let stat = (text, number) => {
+                    return (
+                        <div className="col stat">
+                            <span className="stat-description">{text}</span>
+                            <span className="stat-number">{number}</span>
+                        </div>
+                    )
+                }
                 return (
                     <div className="course row admin" key={i}>
                         <div className="col-md-9">
@@ -139,18 +113,9 @@ class CourseManagement extends React.Component {
                                 </div>
                                 <div className="col-sm-6">
                                     <div className="row align-items-center">
-                                        <div className="col stat">
-                                            <span className="stat-description">Capacity</span>
-                                            <span className="stat-number">{course.courseCapacity}</span>
-                                        </div>
-                                        <div className="col stat">
-                                            <span className="stat-description">Enrolled</span>
-                                            <span className="stat-number">{course.courseEnrolled}</span>
-                                        </div>
-                                        <div className="col stat">
-                                            <span className="stat-description">Available</span>
-                                            <span className="stat-number">{courseStatus}</span>
-                                        </div>
+                                        {stat('Capacity',course.courseCapacity)}
+                                        {stat('Enrolled',course.courseEnrolled)}
+                                        {stat('Available',courseStatus)}
                                     </div>
                                 </div>
                             </div>
@@ -175,62 +140,85 @@ class CourseManagement extends React.Component {
         }
     }
 
+    courseYearSelector = () => {
+        const { courseYearArr, selectedCourseYear } = this.state;
+        let courseYearSelector = courseYearArr.map((courseYear, i) => {
+            return <option value={courseYear.year} key={i}>Course Year {courseYear.year}</option>
+        });
+        return (
+            <select id="courseyear-selector" className="form-control form-control-lg" defaultValue={selectedCourseYear} onChange={this.selectCourseYear}>
+                {courseYearSelector}
+            </select>
+        )
+    }
+
+    signOut = () => {
+        this.setState({ isLoadingComplete: false });
+        auth.signOut()
+            .then( () => {
+                this.setState({
+                    isLoadingComplete: true,
+                    isLogin: false
+                })
+            })
+    }
+
     render(){
-        const {isLoadingComplete, isLogin, isFirstInitSystem, isError, errorMessage } = this.state;
+        const {
+            isLoadingComplete,
+            isLogin,
+            isFirstInitSystem,
+            isError,
+            errorMessage
+        } = this.state;
         
         if (!isLoadingComplete){
             return <LoadingPage/>
         } else if (isError) {
             return <ErrorPage errorMessage={errorMessage} btn={'none'}/>
         } else if (isLogin) {
-            const { courses, courseYearArr, selectedCourseYear } = this.state;
-            const courseDashboard = this.courseDashboard;
             if (isFirstInitSystem) {
                 return (
                     <div className="body body-center bg-gradient">
-                        <div className="wrapper">
+                        <div className="wrapper text-left">
                             <h1>Elective Course Enrollment System</h1>
                             <h2>System Configuration</h2>
                             <p className="mt-2">No course year has been created. You have to create one by press the button below</p>
-                            <a role="button" className="btn btn-primary mt-2" href="/admin/system/config/year">Config Course Years</a>
+                            <div className="mt-2 text-center">
+                                <a role="button" className="btn btn-purple m-1" href="/admin/system/config/year">Config Course Years</a>
+                                <button className="btn btn-green m-1" onClick={this.signOut}><i className="fa fa-sign-out"></i> Logout</button>
+                            </div>
                         </div>
                         <Footer/>
                     </div>
                 )
             } else {
-                const courseYearSelector = courseYearArr.map((courseYear, i) => {
-                    return <option value={courseYear.year} key={i}>Course Year {courseYear.year}</option>
-                });
+                const { courses, selectedCourseYear } = this.state;
                 return (
                     <div className="body bg-gradient">
                         <div className="wrapper">
                             <h1>Elective Course Enrollment System</h1>
                             <h2>System Management</h2>
                             <label htmlFor="courseyear-selector">Select course year which you want to config:</label>
-                            <select id="courseyear-selector" className="form-control form-control-lg" defaultValue={selectedCourseYear} onChange={this.selectCourseYear}>
-                                {courseYearSelector}
-                            </select>
-                            {courseDashboard(courses)}
+                            {this.courseYearSelector()}
+                            {this.courseDashboard(courses)}
                             <div>
                                 <a role="button" className="btn btn-purple m-1" href={`/admin/createcourse?courseYear=${selectedCourseYear}`}>Create New Course</a>
                                 <a role="button" className="btn btn-purple m-1" href={`/admin/config/grade?courseYear=${selectedCourseYear}`}>Config Grade</a>
                             </div>
                             <hr/>
                             <div>
-                                <button className="btn btn-green m-1" onClick={this.logout}><i className="fa fa-sign-out"></i> Logout</button>
+                                <button className="btn btn-green m-1" onClick={this.signOut}><i className="fa fa-sign-out"></i> Logout</button>
                                 <a role="button" className="btn btn-green m-1" href="/admin/system/config/year">Config Course Years</a>
                             </div>
                         </div>
                         <Footer/>
                     </div>
-                    
                 )
-                
             }
         } else {
             return <Admin/>
         }
-        
     }
 }
 

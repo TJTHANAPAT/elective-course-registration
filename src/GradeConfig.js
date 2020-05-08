@@ -4,6 +4,8 @@ import 'firebase/firestore';
 import LoadingPage from './Loading';
 import ErrorPage from './ErrorPage';
 import Footer from './Footer';
+import * as auth from './authenticationFuctions';
+import * as admin from './adminFunctions';
 
 class GradeConfig extends React.Component {
     state = {
@@ -16,16 +18,19 @@ class GradeConfig extends React.Component {
         gradeAdd:''
     }
     componentDidMount = () => {
-        this.getURLParam('courseYear')
+        auth.checkAuthState()
+            .then( () => {
+                return admin.getURLParam('courseYear');
+            })
             .then( res => {
                 const courseYear = res;
                 this.setState({ courseYear:courseYear });
-                return this.getSystemConfig();
+                return admin.getSystemConfig();
             })
             .then( res => {
-                const systemConfig = res;
+                const courseYearsArr = res.systemConfig.courseYears;
                 const { courseYear } = this.state;
-                return this.getCourseYearGrades(courseYear, systemConfig);
+                return admin.getCourseYearGrades(courseYear, courseYearsArr, false);
             })
             .then( res => {
                 this.setState({
@@ -42,85 +47,6 @@ class GradeConfig extends React.Component {
                     errorMessage: err
                 })
             })
-    }
-
-    getURLParam = (parameter) => {
-        const searchParams = new URLSearchParams(window.location.search);
-        const param = searchParams.get(parameter);
-        return new Promise ((resolve, reject) => {
-            if (param === '') {
-                reject(`Parameter with key '${parameter}' is found but it is blank.`);
-            } else if (param === null) {
-                reject(`Parameter with key '${parameter}' is not found in url.`);
-            } else {
-                resolve(param)
-            }
-        })
-    }
-    getSystemConfig = () => {
-        const db = firebase.firestore();
-        const configRef = db.collection('systemConfig').doc('config')
-        return new Promise ((resolve, reject) => {
-            configRef.get()
-                .then(doc => {
-                    if (doc.exists) {
-                        resolve(doc.data());
-                    } else {
-                        const err = 'No system config has been initilized.';
-                        reject(err);
-                        
-                    }
-                })
-                .catch(err => {
-                    const errorMessage = 'Firebase failed getting system config.';
-                    reject(errorMessage);
-                    console.error(err);
-                })
-        })
-    }
-    checkCourseYearExist = (courseYear, systemConfigDoc) => {
-        let isCourseYearExist = false;
-        const courseYearArr = systemConfigDoc.courseYears;
-        for (let i = 0; i < courseYearArr.length; i++) {
-            if (courseYearArr[i].year === courseYear) {
-                isCourseYearExist = true
-            }
-        }
-        return isCourseYearExist;
-    }
-    getCourseYearGrades = (courseYear, systemConfig) => {
-        const db = firebase.firestore();
-        const configRef = db.collection(courseYear).doc('config')
-        return new Promise ((resolve, reject) => {
-            if (this.checkCourseYearExist(courseYear, systemConfig)) {
-                configRef.get()
-                    .then( doc => {
-                        if (doc.exists) {
-                            resolve({
-                                isFirstInitConfig: false,
-                                grades: doc.data().grades
-                            });
-                        } else {
-                            const warn = `No config of Course Year ${courseYear} has been found in database. It will be initialized after saving.`;
-                            console.warn(warn);
-                            resolve({
-                                isFirstInitConfig: true,
-                                grades: []
-                            });
-                        }
-                    })
-                    .catch( err => { 
-                        const errorMessage = 'Firebase failed getting course year config.';
-                        reject(errorMessage);
-                        console.error(err);
-                    })
-            } else {
-                const err = `No course year ${courseYear} has been found in database`;
-                reject(err);
-            }
-            
-        })
-        
     }
 
     updateInput = (event) => {
@@ -203,7 +129,6 @@ class GradeConfig extends React.Component {
         }
     }
 
-
     render(){
         const {isLoadingComplete, isError, errorMessage } = this.state;
 
@@ -234,12 +159,9 @@ class GradeConfig extends React.Component {
                             <button type="submit" className="btn btn-purple" onClick={this.saveGrade}>Save</button>
                             <button onClick={this.goBack} className="btn btn-secondary ml-2">Back</button>
                         </div>
-                        
-
                     </div>
                     <Footer/>
                 </div>
-                
             )
         }
     }

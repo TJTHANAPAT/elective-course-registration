@@ -6,15 +6,25 @@ import LoadingPage from './Loading';
 import ErrorPage from './ErrorPage';
 import Footer from './Footer';
 
+import * as auth from './authenticationFuctions';
+import * as admin from './adminFunctions';
+
 class CourseYearConfig extends React.Component {
     state = {
         isLoadingComplete: false,
-        courseYearAdd:'',
-        courseYearArr:[],
-        currentCourseYear:'',
+        courseYearAdd: '',
     }
     componentDidMount = () => {
-        this.getSystemConfig()
+        auth.checkAuthState()
+            .then( res => {
+                const user = res.user;
+                const isLogin = res.isLogin;
+                this.setState({
+                    currentUser: user,
+                    isLogin: isLogin,
+                })
+                return admin.getSystemConfig(false)
+            })
             .then( res => {
                 const isFirstInitSystem = res.isFirstInitSystem;
                 if (!isFirstInitSystem) {
@@ -22,27 +32,28 @@ class CourseYearConfig extends React.Component {
                     this.setState({
                         isLoadingComplete: true,
                         currentCourseYear: systemConfig.currentCourseYear,
-                        courseYearArr: systemConfig.courseYears
+                        courseYearsArr: systemConfig.courseYears
                     });
                 } else {
                     console.warn('No course year config has ever been found in database. It will be initialized after saving.')
                     this.setState({
                         isLoadingComplete: true,
-                        isFirstInitSystem: true
+                        isFirstInitSystem: true,
+                        currentCourseYear: '',
+                        courseYearsArr: []
                     })
                 }
-                console.log(res);
             })
             .catch( err => {
                 console.error(err);
+                this.setState({
+                    isLoadingComplete: true,
+                    isError: true,
+                    errorMessage: err
+                })
             })
-
-        //add FontAwesome
-        const link = document.createElement('link');
-        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css';
-        link.rel = 'stylesheet';
-        document.head.appendChild(link);
     }
+    
     updateInput = (event) => {
         this.setState({
             [event.target.id]:event.target.value
@@ -50,67 +61,34 @@ class CourseYearConfig extends React.Component {
         console.log(event.target.id,':',event.target.value)
     }
 
-    getSystemConfig = () => {
-        const db = firebase.firestore();
-        const configRef = db.collection('systemConfig').doc('config')
-        return new Promise ((resolve, reject) => {
-            configRef.get()
-                .then(doc => {
-                    if (!doc.exists) {
-                        console.warn('No system config has been initilized.');
-                        resolve({ isFirstInitSystem: true });
-                    } else {
-                        resolve({
-                            isFirstInitSystem: false,
-                            systemConfig: doc.data()
-                        });
-                    }
-                })
-                .catch(err => {
-                    const errorMessage = 'Firebase failed getting system config.';
-                    reject(errorMessage);
-                    console.error(err);
-                })
-        })
-    }
-
-    checkCourseYearExist = (courseYear) => {
-        const { courseYearArr } = this.state;
-        let isCourseYearExist = false;
-        for (let i = 0; i < courseYearArr.length; i++) {
-            if (courseYearArr[i].year === courseYear) {
-                isCourseYearExist = true
-            }
-        }
-        return (isCourseYearExist)
-    }
-
     addNewCourseYear = (event) => {
         event.preventDefault();
-        const {courseYearAdd, courseYearArr} = this.state
-        if(!this.checkCourseYearExist(courseYearAdd)){
+        const { courseYearAdd, courseYearsArr } = this.state
+        if(!admin.checkCourseYearExist(courseYearAdd,courseYearsArr)){
             const newCourseYear = {
                 year: courseYearAdd.toString(),
                 available: false,
             };
-            courseYearArr.push(newCourseYear)
-            const courseYearArrSortedYear = [];
-            for (let i = 0; i < courseYearArr.length; i++) {
-                courseYearArrSortedYear.push(courseYearArr[i].year);
+            courseYearsArr.push(newCourseYear)
+            const courseYearsArrSortedYear = [];
+            for (let i = 0; i < courseYearsArr.length; i++) {
+                courseYearsArrSortedYear.push(courseYearsArr[i].year);
             }
-            courseYearArrSortedYear.sort((a, b) => a - b);
-            const courseYearArrSorted = [];
-            for (let i = 0; i < courseYearArrSortedYear.length; i++) {
-                const year = courseYearArrSortedYear[i];
-                for (let j = 0; j < courseYearArr.length; j++) {
-                    const courseYear = courseYearArr[j];
+            courseYearsArrSortedYear.sort((a, b) => a - b);
+            const courseYearsArrSorted = [];
+            for (let i = 0; i < courseYearsArrSortedYear.length; i++) {
+                const year = courseYearsArrSortedYear[i];
+                for (let j = 0; j < courseYearsArr.length; j++) {
+                    const courseYear = courseYearsArr[j];
                     if(year === courseYear.year) {
-                        courseYearArrSorted.push(courseYear);
+                        courseYearsArrSorted.push(courseYear);
                     }
                 }
             }
-            this.setState({courseYearArr:courseYearArrSorted,courseYearAdd:''})
-            console.log(courseYearArrSorted)
+            this.setState({
+                courseYearsArr: courseYearsArrSorted,
+                courseYearAdd:''})
+            console.log(courseYearsArrSorted)
         } else {
             alert(`${courseYearAdd} is already exist!`)
         }
@@ -119,14 +97,18 @@ class CourseYearConfig extends React.Component {
 
     removeCourseYear = (event) => {
         event.preventDefault();
-        const courseYearArr = this.state.courseYearArr;
-        for (let i = 0; i < courseYearArr.length; i++) {
-            if ( courseYearArr[i].year === event.target.value) {
-                courseYearArr.splice(i, 1);
-                console.log('Remove Course Year', event.target.value)
+        const { courseYearsArr, currentCourseYear } = this.state;
+        const courseYear = event.target.value
+        for (let i = 0; i < courseYearsArr.length; i++) {
+            if ( courseYearsArr[i].year === courseYear) {
+                courseYearsArr.splice(i, 1);
+                console.log('Remove Course Year', courseYear)
             }
         }
-        this.setState({TestArr:courseYearArr})
+        if (currentCourseYear === courseYear) {
+            this.setState({ currentCourseYear:'' });
+        }
+        this.setState({ courseYearsArr: courseYearsArr });
     }
 
     setCurrentCourseYear = (event) => {
@@ -138,14 +120,15 @@ class CourseYearConfig extends React.Component {
         event.preventDefault();
         const db = firebase.firestore();
         const configRef = db.collection('systemConfig').doc('config')
-        const { courseYearArr, currentCourseYear, isFirstInitSystem } = this.state;
+        const { courseYearsArr, currentCourseYear, isFirstInitSystem } = this.state;
+        const config = {
+            courseYears:courseYearsArr,
+            currentCourseYear:currentCourseYear
+        }
         if (currentCourseYear === '') {
             alert('You have to set the current course year.');
         } else if (!isFirstInitSystem) {
-            configRef.update({
-                courseYears:courseYearArr,
-                currentCourseYear:currentCourseYear
-            })
+            configRef.update(config)
                 .then(() => {
                     console.log('Update successfully!')
                     alert('Update successfully!')
@@ -154,19 +137,15 @@ class CourseYearConfig extends React.Component {
                     console.error('Error: ', err)
                 })
         } else {
-            configRef.set({
-                courseYears:courseYearArr,
-                currentCourseYear:currentCourseYear
-            })
-            .then(() => {
-                console.log('Update successfully!')
-                alert('Update successfully!')
-            })
-            .catch(err => { 
-                console.error('Error: ', err)
-            })
+            configRef.set(config)
+                .then(() => {
+                    console.log('Save successfully!')
+                    alert('Save successfully!')
+                })
+                .catch(err => { 
+                    console.error('Error: ', err)
+                })
         }
-        
     }
 
     goBack = () => {
@@ -174,24 +153,22 @@ class CourseYearConfig extends React.Component {
     }
 
     handleChangeCourseYearAvailable = (checked, event, id) => {
-        console.log(id)
-        console.log(checked)
-        const { courseYearArr } = this.state;
-        for (let i = 0; i < courseYearArr.length; i++) {
-            const courseYear = courseYearArr[i];
+        event.preventDefault();
+        const { courseYearsArr } = this.state;
+        for (let i = 0; i < courseYearsArr.length; i++) {
+            const courseYear = courseYearsArr[i];
             if (courseYear.year === id) {
                 courseYear.available = checked;
             }
-            
         }
-        this.setState({courseYearArr:courseYearArr})
-        console.log(this.state.courseYearArr)
+        this.setState({ courseYearsArr: courseYearsArr });
+        console.log(this.state.courseYearsArr)
     }
 
-    courseYearList = () => {
-        const { courseYearArr, currentCourseYear } = this.state
-        if (courseYearArr.length !== 0) {
-            let courseYearSelector = courseYearArr.map((courseYear, i) => {
+    courseYearsList = () => {
+        const { courseYearsArr, currentCourseYear } = this.state
+        if (courseYearsArr.length !== 0) {
+            let courseYearSelector = courseYearsArr.map((courseYear, i) => {
                 let btnCurrentYear = () => {
                     if (currentCourseYear === courseYear.year) {
                         return <button className="btn btn-success m-1 ml-2 fa fa-bookmark"></button>
@@ -246,7 +223,6 @@ class CourseYearConfig extends React.Component {
         )
     }
 
-
     render(){
         const { isLoadingComplete, isError, errorMessage } = this.state;
         if (!isLoadingComplete){
@@ -258,7 +234,7 @@ class CourseYearConfig extends React.Component {
                 <div className="body bg-gradient">
                     <div className="wrapper">
                         <h1>Course Years Configuration</h1>
-                        {this.courseYearList()}
+                        {this.courseYearsList()}
                         {this.addNewCourseYearForm()}
                         <div className="mt-2">
                             <button type="submit" className="btn btn-purple" onClick={this.save}>Save</button>

@@ -1,7 +1,4 @@
 import React from 'react';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
-import 'firebase/auth';
 import LoadingPage from './Loading';
 import Footer from './Footer';
 import ErrorPage from './ErrorPage';
@@ -13,23 +10,28 @@ class Admin extends React.Component {
     }
     componentDidMount = () => {
         auth.checkAuthState(false)
-            .then( res => {
+            .then(res => {
                 const user = res.user;
                 const isLogin = res.isLogin;
-                if (!user) {
-                    console.log('No user logged in.');
-                }
                 this.setState({
                     currentUser: user,
                     isLogin: isLogin,
                     isLoadindComplete: true
                 })
             })
+            .catch(err => {
+                console.error(err);
+                this.setState({
+                    isLoadindComplete: true,
+                    isError: true,
+                    errorMessage: err
+                })
+            })
     }
 
     updateInput = (event) => {
         this.setState({
-          [event.target.id]: event.target.value
+            [event.target.id]: event.target.value
         });
     }
 
@@ -38,22 +40,22 @@ class Admin extends React.Component {
         const { email, password } = this.state
         this.setState({ isLoadindComplete: false });
         auth.signInWithEmailAndPassword(email, password)
-            .then( res => {
+            .then(res => {
                 this.setState({
                     currentUser: res,
                     isLogin: true,
                     isLoadindComplete: true
                 })
             })
-            .catch( err => {
+            .catch(err => {
                 this.setState({
                     isLoadindComplete: true,
                     isError: true,
-                    errorMessage : err
-                })      
+                    errorMessage: err
+                })
                 console.log(err)
             })
-        
+
     }
 
     loginForm = () => {
@@ -66,7 +68,7 @@ class Admin extends React.Component {
                             <i className="fa fa-user"></i>
                         </div>
                     </div>
-                    <input type="email" className="form-control" id="email" placeholder="admin@email.com" onChange={updateInput} required/>
+                    <input type="email" className="form-control" id="email" placeholder="admin@email.com" onChange={updateInput} required />
                 </div>
                 <div className="input-group mb-2">
                     <div className="input-group-prepend">
@@ -74,21 +76,21 @@ class Admin extends React.Component {
                             <i className="fa fa-lock"></i>
                         </div>
                     </div>
-                    <input type="password" className="form-control" id="password" placeholder="Password" onChange={updateInput} required/>
+                    <input type="password" className="form-control" id="password" placeholder="Password" onChange={updateInput} required />
                 </div>
                 <button type="submit" className="btn btn-wrapper-bottom btn-purple ">Login</button>
             </form>
         )
     }
 
-    render(){
+    render() {
         const { isLoadindComplete, isLogin, isError, errorMessage } = this.state;
         if (!isLoadindComplete) {
-            return <LoadingPage/>
+            return <LoadingPage />
         } else if (isError) {
-            return <ErrorPage errorMessage={errorMessage} btn={'none'}/>
+            return <ErrorPage errorMessage={errorMessage} btn={'none'} />
         } else if (isLogin) {
-            return <CourseManagement/>
+            return <CourseManagement />
         } else {
             return (
                 <div className="body body-center bg-gradient">
@@ -96,12 +98,12 @@ class Admin extends React.Component {
                         <h1>Login</h1>
                         {this.loginForm()}
                     </div>
-                    <Footer/>
+                    <Footer />
                 </div>
-            
+
             )
         }
-        
+
     }
 }
 
