@@ -1,9 +1,9 @@
 import React from 'react';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
-import LoadingPage from './LoadingPage';
-import Footer from './Footer';
-import ErrorPage from './ErrorPage';
+import LoadingPage from './components/LoadingPage';
+import ErrorPage from './components/ErrorPage';
+import Footer from './components/Footer';
 
 class GetStudentData extends React.Component {
     state = {

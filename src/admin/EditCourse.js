@@ -1,7 +1,7 @@
 import React from 'react';
-import LoadingPage from '../LoadingPage';
-import Footer from '../Footer';
-import ErrorPage from '../ErrorPage';
+import LoadingPage from '../components/LoadingPage';
+import Footer from '../components/Footer';
+import ErrorPage from '../components/ErrorPage';
 import * as auth from './functions/authenticationFuctions';
 import * as admin from '../systemFunction';
 import updateCourse from './functions/updateCourseFunction';

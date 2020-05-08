@@ -2,9 +2,9 @@ import React from 'react';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import Switch from 'react-switch';
-import LoadingPage from '../LoadingPage';
-import ErrorPage from '../ErrorPage';
-import Footer from '../Footer';
+import LoadingPage from '../components/LoadingPage';
+import Footer from '../components/Footer';
+import ErrorPage from '../components/ErrorPage';
 
 import * as auth from './functions/authenticationFuctions';
 import * as system from '../systemFunction';

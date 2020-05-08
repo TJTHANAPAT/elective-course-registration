@@ -2,9 +2,9 @@ import React from 'react';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/auth';
-import LoadingPage from '../LoadingPage';
-import ErrorPage from '../ErrorPage';
-import Footer from '../Footer';
+import LoadingPage from '../components/LoadingPage';
+import Footer from '../components/Footer';
+import ErrorPage from '../components/ErrorPage';
 import Admin from './Admin';
 
 import * as auth from './functions/authenticationFuctions';
