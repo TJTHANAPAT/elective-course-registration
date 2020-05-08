@@ -8,7 +8,7 @@ import Footer from './Footer';
 import Admin from './Admin';
 
 import * as auth from './authenticationFuctions';
-import * as admin from './adminFunctions';
+import * as admin from './systemFunction';
 
 class CourseManagement extends React.Component {
     state = {

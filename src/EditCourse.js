@@ -3,7 +3,7 @@ import LoadingPage from './Loading';
 import Footer from './Footer';
 import ErrorPage from './ErrorPage';
 import * as auth from './authenticationFuctions';
-import * as admin from './adminFunctions';
+import * as admin from './systemFunction';
 import updateCourse from './updateCourseFunction';
 import deleteCourse from './deleteCourseFunction';
 

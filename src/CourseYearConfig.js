@@ -7,7 +7,7 @@ import ErrorPage from './ErrorPage';
 import Footer from './Footer';
 
 import * as auth from './authenticationFuctions';
-import * as admin from './adminFunctions';
+import * as system from './systemFunction';
 
 class CourseYearConfig extends React.Component {
     state = {
@@ -23,7 +23,7 @@ class CourseYearConfig extends React.Component {
                     currentUser: user,
                     isLogin: isLogin,
                 })
-                return admin.getSystemConfig(false)
+                return system.getSystemConfig(false)
             })
             .then( res => {
                 const isFirstInitSystem = res.isFirstInitSystem;
@@ -53,6 +53,10 @@ class CourseYearConfig extends React.Component {
                 })
             })
     }
+
+    goBack = () => {
+        window.history.back();
+    }
     
     updateInput = (event) => {
         this.setState({
@@ -64,7 +68,7 @@ class CourseYearConfig extends React.Component {
     addNewCourseYear = (event) => {
         event.preventDefault();
         const { courseYearAdd, courseYearsArr } = this.state
-        if(!admin.checkCourseYearExist(courseYearAdd,courseYearsArr)){
+        if(!system.checkCourseYearExist(courseYearAdd,courseYearsArr)){
             const newCourseYear = {
                 year: courseYearAdd.toString(),
                 available: false,
@@ -146,10 +150,6 @@ class CourseYearConfig extends React.Component {
                     console.error('Error: ', err)
                 })
         }
-    }
-
-    goBack = () => {
-        window.history.back();
     }
 
     handleChangeCourseYearAvailable = (checked, event, id) => {

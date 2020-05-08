@@ -6,7 +6,7 @@ import Footer from './Footer';
 import ErrorPage from './ErrorPage';
 
 import * as auth from './authenticationFuctions';
-import * as admin from './adminFunctions';
+import * as system from './systemFunction';
 import createCourse from './createCourseFunction';
 
 class CreateCourse extends React.Component {
@@ -23,17 +23,17 @@ class CreateCourse extends React.Component {
     componentDidMount = () => {
         auth.checkAuthState()
             .then(() => {
-                return admin.getURLParam('courseYear');
+                return system.getURLParam('courseYear');
             })
             .then(res => {
                 const courseYear = res;
                 this.setState({ courseYear: courseYear });
-                return admin.getSystemConfig();
+                return system.getSystemConfig();
             })
             .then(res => {
                 const courseYearsArr = res.systemConfig.courseYears;
                 const { courseYear } = this.state;
-                return admin.getCourseYearGrades(courseYear, courseYearsArr);
+                return system.getCourseYearGrades(courseYear, courseYearsArr);
             })
             .then(res => {
                 this.setState({

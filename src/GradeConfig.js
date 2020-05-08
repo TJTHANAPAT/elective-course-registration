@@ -5,7 +5,7 @@ import LoadingPage from './Loading';
 import ErrorPage from './ErrorPage';
 import Footer from './Footer';
 import * as auth from './authenticationFuctions';
-import * as admin from './adminFunctions';
+import * as system from './systemFunction';
 
 class GradeConfig extends React.Component {
     state = {
@@ -20,17 +20,17 @@ class GradeConfig extends React.Component {
     componentDidMount = () => {
         auth.checkAuthState()
             .then( () => {
-                return admin.getURLParam('courseYear');
+                return system.getURLParam('courseYear');
             })
             .then( res => {
                 const courseYear = res;
                 this.setState({ courseYear:courseYear });
-                return admin.getSystemConfig();
+                return system.getSystemConfig();
             })
             .then( res => {
                 const courseYearsArr = res.systemConfig.courseYears;
                 const { courseYear } = this.state;
-                return admin.getCourseYearGrades(courseYear, courseYearsArr, false);
+                return system.getCourseYearGrades(courseYear, courseYearsArr, false);
             })
             .then( res => {
                 this.setState({
@@ -47,6 +47,10 @@ class GradeConfig extends React.Component {
                     errorMessage: err
                 })
             })
+    }
+
+    goBack = () => {
+        window.history.back();
     }
 
     updateInput = (event) => {
@@ -102,10 +106,6 @@ class GradeConfig extends React.Component {
             })
         }
         
-    }
-
-    goBack = () => {
-        window.history.back();
     }
 
     gradeList = () => {

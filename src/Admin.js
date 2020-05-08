@@ -4,10 +4,13 @@ import Footer from './Footer';
 import ErrorPage from './ErrorPage';
 import CourseManagement from './CourseManagement';
 import * as auth from './authenticationFuctions';
+
 class Admin extends React.Component {
+
     state = {
         isLoadindComplete: false
     }
+
     componentDidMount = () => {
         auth.checkAuthState(false)
             .then(res => {
@@ -55,7 +58,6 @@ class Admin extends React.Component {
                 })
                 console.log(err)
             })
-
     }
 
     loginForm = () => {
@@ -100,11 +102,10 @@ class Admin extends React.Component {
                     </div>
                     <Footer />
                 </div>
-
             )
         }
-
     }
+    
 }
 
 export default Admin;
