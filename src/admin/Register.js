@@ -3,7 +3,6 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import Footer from '../components/Footer';
-import * as auth from './functions/authenticationFuctions';
 import * as system from '../functions/systemFunctions';
 import LoadingPage from '../components/LoadingPage';
 import ErrorPage from '../components/ErrorPage';

@@ -1,38 +1,40 @@
 import React from 'react';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
+import * as system from './functions/systemFunctions';
 import LoadingPage from './components/LoadingPage';
 import ErrorPage from './components/ErrorPage';
 import Footer from './components/Footer';
 
 class GetStudentData extends React.Component {
     state = {
-        searchStudentID:'',
-        studentID:'',
+        searchStudentID: '',
+        studentID: '',
 
-        courseYearArr:[],
-        selectedCourseYear:'',
-        lastSearchCourseYear:'',
+        courseYearArr: [],
+        selectedCourseYear: '',
+        lastSearchCourseYear: '',
 
-        isSelectedCourseYearChange:false,
-        isLoadingComplete:false,
-        isLoadingData:false,
-        isGetDataComplete:false,
-        isDataExists:false,
-        alertMessage:''
+        isSelectedCourseYearChange: false,
+        isLoadingComplete: false,
+        isLoadingData: false,
+        isGetDataComplete: false,
+        isDataExists: false,
+        alertMessage: ''
     }
     componentDidMount = () => {
-        this.getSystemConfig()
-            .then( res => {
-                const currentCourseYear = res.currentCourseYear;
-                const courseYearArr = res.courseYears;
+        system.getSystemConfig()
+            .then(res => {
+                const systemConfig = res.systemConfig;
+                const currentCourseYear = systemConfig.currentCourseYear;
+                const courseYearArr = systemConfig.courseYears;
                 this.setState({
                     courseYearArr: courseYearArr,
                     selectedCourseYear: currentCourseYear,
                     isLoadingComplete: true
                 })
             })
-            .catch( err => {
+            .catch(err => {
                 console.error(err);
                 this.setState({
                     isLoadingComplete: true,
@@ -41,37 +43,20 @@ class GetStudentData extends React.Component {
                 })
             })
     }
-    
-    getSystemConfig = () => {
-        const db = firebase.firestore();
-        const configRef = db.collection('systemConfig').doc('config')
-        return new Promise ((resolve, reject) => {
-            configRef.get()
-                .then(doc => {
-                    if (!doc.exists) {
-                        const err = 'No system config has been initilized.'
-                        reject(err);
-                    } else {
-                        resolve(doc.data());
-                    }
-                })
-                .catch(err => {
-                    const errorMessage = 'Firebase Error.';
-                    reject(errorMessage);
-                    console.error(err);
-                })
-        })
+
+    goBack = () => {
+        window.history.back();
     }
 
     updateInputByID = (event) => {
         this.setState({
-            [event.target.id]:event.target.value
+            [event.target.id]: event.target.value
         })
     }
 
     selectCourseYear = (event) => {
         const newSelectCourseYear = event.target.value;
-        this.setState({selectedCourseYear:newSelectCourseYear});
+        this.setState({ selectedCourseYear: newSelectCourseYear });
     }
 
     searchStudentByID = (event) => {
@@ -92,70 +77,65 @@ class GetStudentData extends React.Component {
                 isLoadingData: true
             });
             studentRef.doc(searchStudentID).get()
-            .then(studentDoc => {
-                if (studentDoc.exists) {
-                    const {
-                        nameTitle,
-                        nameFirst,
-                        nameLast,
-                        studentID,
-                        studentGrade,
-                        studentClass,
-                        studentRoll,
-                        enrolledCourse,
-                        timestamp
-                    } = studentDoc.data();
-                    
-                    courseRef.doc(enrolledCourse).get()
-                        .then(courseDoc => {
-                            const {courseName} = courseDoc.data()
-                            const studentData = {
-                                studentID: studentID,
-                                nameTitle: nameTitle,
-                                nameFirst: nameFirst,
-                                nameLast: nameLast,
-                                studentGrade: studentGrade,
-                                studentClass: studentClass,
-                                studentRoll: studentRoll,
-                                enrolledCourse: enrolledCourse,
-                                courseName: courseName,
-                                timestamp: new Date(timestamp.seconds*1000).toLocaleString()
-                            }
-                            this.setState({
-                                studentID: studentID,
-                                studentData: studentData,
-                                lastSearchCourseYear:selectedCourseYear,
-                                isLoadingData: false,
-                                isGetDataComplete: true,
-                                isDataExists: true,
-                                alertMessage:''
-                            })
-                        })
-                        .catch(err => {
-                            console.error('Error: ', err)
-                            this.setState({alertMessage:`Error: ${err}`})
-                        })
-                } else {
-                    this.setState({
-                        isGetDataComplete: true,
-                        isLoadingData: false,
-                        isDataExists: false,
-                        studentID: searchStudentID,
-                        lastSearchCourseYear:selectedCourseYear,
-                        alertMessage:`No student with ID ${searchStudentID} found in database! Input studentID might be incorrect or haven't be enrolled in any course.`
-                    })
-                }
-            })
-            .catch(err => {
-                console.error('Error: ', err)
-                this.setState({alertMessage:`Error: ${err}`})
-            })
-        }
-        
-    }
+                .then(studentDoc => {
+                    if (studentDoc.exists) {
+                        const {
+                            nameTitle,
+                            nameFirst,
+                            nameLast,
+                            studentID,
+                            studentGrade,
+                            studentClass,
+                            studentRoll,
+                            enrolledCourse,
+                            timestamp
+                        } = studentDoc.data();
 
-    goBack = () => {
-        window.history.back();
+                        courseRef.doc(enrolledCourse).get()
+                            .then(courseDoc => {
+                                const { courseName } = courseDoc.data()
+                                const studentData = {
+                                    studentID: studentID,
+                                    nameTitle: nameTitle,
+                                    nameFirst: nameFirst,
+                                    nameLast: nameLast,
+                                    studentGrade: studentGrade,
+                                    studentClass: studentClass,
+                                    studentRoll: studentRoll,
+                                    enrolledCourse: enrolledCourse,
+                                    courseName: courseName,
+                                    timestamp: new Date(timestamp.seconds * 1000).toLocaleString()
+                                }
+                                this.setState({
+                                    studentID: studentID,
+                                    studentData: studentData,
+                                    lastSearchCourseYear: selectedCourseYear,
+                                    isLoadingData: false,
+                                    isGetDataComplete: true,
+                                    isDataExists: true,
+                                    alertMessage: ''
+                                })
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                this.setState({ alertMessage: `Error: ${err.message}` });
+                            })
+                    } else {
+                        this.setState({
+                            isGetDataComplete: true,
+                            isLoadingData: false,
+                            isDataExists: false,
+                            studentID: searchStudentID,
+                            lastSearchCourseYear: selectedCourseYear,
+                            alertMessage: `No student with ID ${searchStudentID} found in database! Input studentID might be incorrect or haven't be enrolled in any course.`
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    this.setState({ alertMessage: `Error: ${err.message}` });
+                })
+        }
     }
 
     studentData = () => {
@@ -186,9 +166,9 @@ class GetStudentData extends React.Component {
                 <div>
                     <h5>{nameFirst} {nameLast} ({studentID})</h5>
                     <p>
-                        Fullname: {nameTitle} {nameFirst} {nameLast}<br/>
-                        Student ID: {studentID}<br/>
-                        Grade: {studentGrade} Class: {studentClass} Roll: {studentRoll}<br/>
+                        Fullname: {nameTitle} {nameFirst} {nameLast}<br />
+                        Student ID: {studentID}<br />
+                        Grade: {studentGrade} Class: {studentClass} Roll: {studentRoll}<br />
                         Enrolled Course: {enrolledCourse} {courseName}
                     </p>
                     <p><i>Enrolled since {timestamp}</i></p>
@@ -211,9 +191,9 @@ class GetStudentData extends React.Component {
             errorMessage
         } = this.state;
         if (!isLoadingComplete) {
-            return <LoadingPage/>
+            return <LoadingPage />
         } else if (isError) {
-            return <ErrorPage errorMessage={errorMessage} btn={'home'}/>
+            return <ErrorPage errorMessage={errorMessage} btn={'home'} />
         } else {
             const {
                 searchStudentID,
@@ -233,15 +213,15 @@ class GetStudentData extends React.Component {
                         </select>
                         <form onSubmit={this.searchStudentByID}>
                             <div className="form-group">
-                                <input type="text" id="searchStudentID" className="form-control" onChange={this.updateInputByID} value={searchStudentID} placeholder="Student ID" required/>
+                                <input type="text" id="searchStudentID" className="form-control" onChange={this.updateInputByID} value={searchStudentID} placeholder="Student ID" required />
                             </div>
                             <button type="submit" className="btn btn-purple">Search</button>
                             <button onClick={this.goBack} className="btn btn-secondary ml-2">Back</button>
                         </form>
-                        <br/>
+                        <br />
                         {this.studentData()}
                     </div>
-                    <Footer/>
+                    <Footer />
                 </div>
             )
         }
