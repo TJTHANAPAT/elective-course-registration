@@ -1,6 +1,7 @@
 import React from 'react';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
+import * as system from './functions/systemFunctions';
 
 import LoadingPage from './components/LoadingPage';
 import ErrorPage from './components/ErrorPage';
@@ -17,17 +18,15 @@ class Dashboard extends React.Component {
     }
 
     componentDidMount = () => {
-        this.getSystemConfig()
-            .then( res => {
-                const systemConfigDoc = res;
-                const courseYear = systemConfigDoc.currentCourseYear;
-                this.setState({ courseYear: courseYear });
-                return this.checkCourseYearAvailable(courseYear, systemConfigDoc);
-            })
-            .then( res => {
-                const { courseYear } = this.state;
-                console.log(res);
-                return this.getCourseYearConfig(courseYear);
+        system.getSystemConfig()
+            .then(res => {
+                const systemConfig = res.systemConfig;
+                const courseYear = systemConfig.currentCourseYear;
+                const courseYearsArr = systemConfig.courseYears;
+                this.setState({
+                    courseYear: courseYear,
+                });
+                return system.getCourseYearGrades(courseYear,courseYearsArr)
             })
             .then( res => {
                 const { courseYear } = this.state;
@@ -42,65 +41,6 @@ class Dashboard extends React.Component {
                     errorMessage: err
                 })
             })
-    }
-
-    getSystemConfig = () => {
-        const db = firebase.firestore();
-        const configRef = db.collection('systemConfig').doc('config')
-        return new Promise ((resolve, reject) => {
-            configRef.get()
-                .then(doc => {
-                    if (!doc.exists) {
-                        const err = 'No system config has been initilized.'
-                        reject(err);
-                    } else {
-                        resolve(doc.data());
-                    }
-                })
-                .catch(err => {
-                    const errorMessage = 'Firebase failed getting system config.';
-                    reject(errorMessage);
-                    console.error(err);
-                })
-        })
-    }
-
-    getCourseYearConfig = (courseYear) => {
-        const db = firebase.firestore();
-        const courseYearConfigRef = db.collection(courseYear).doc('config');
-        return new Promise ((resolve, reject) => {
-            courseYearConfigRef.get()
-                .then( doc => {
-                    if (doc.exists) {
-                        resolve(doc.data());
-                    } else {
-                        const err = `No config of course year ${courseYear} has been found in database.`
-                        reject(err);
-                    }
-                })
-                .catch( err => {
-                    const errorMessage = 'Firebase failed getting course year config.';
-                    reject(errorMessage);
-                    console.error(err);
-                })
-        })
-    }
-
-    checkCourseYearAvailable = (courseYear, systemConfigDoc) => {
-        return new Promise ((resolve, reject) => {
-            const courseYearArr = systemConfigDoc.courseYears;
-            let isCourseYearAvailable = false
-            for (let i = 0; i < courseYearArr.length; i++) {
-                if(courseYearArr[i].year === courseYear) {
-                    isCourseYearAvailable = courseYearArr[i].available;
-                }
-            }
-            if (isCourseYearAvailable) {
-                resolve(`Courses in course year ${courseYear} is available to enroll.`);
-            } else {
-                reject(`Courses in course year ${courseYear} is not available to enroll.`);
-            }
-        })
     }
 
     getCoursesData = (courseYear) => {
