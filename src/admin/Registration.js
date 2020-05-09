@@ -11,15 +11,15 @@ import * as auth from './functions/authenticationFuctions';
 import * as system from '../functions/systemFunctions';
 
 class Registration extends React.Component {
+
     state = {
         isLoadingComplete: false,
         isError: false,
         errorMessage: '',
         isRegisterEnabled: false
     }
+
     componentDidMount = () => {
-        const shortid = require('shortid');
-        console.log(shortid.generate());
         auth.checkAuthState()
             .then(() => {
                 return system.getSystemConfig();
@@ -111,6 +111,7 @@ class Registration extends React.Component {
             )
         }
     }
+    
 }
 
 export default Registration;
