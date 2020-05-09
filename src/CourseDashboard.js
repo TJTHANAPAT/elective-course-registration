@@ -165,13 +165,9 @@ class Dashboard extends React.Component {
     render(){
         const { isLoadingComplete, isError, errorMessage } = this.state;
         if(!isLoadingComplete){
-            return (
-                <LoadingPage/>
-            )
+            return <LoadingPage/>
         } else if (isError){
-            return (
-                <ErrorPage errorMessage={errorMessage} btn={'home'}/>
-            )
+            return <ErrorPage errorMessage={errorMessage} btn={'home'}/>
         } else {
             const { courses, courseYear, gradesArr } = this.state;
             const courseDashboard = this.courseDashboard;

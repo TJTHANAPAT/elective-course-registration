@@ -185,11 +185,7 @@ class GetStudentData extends React.Component {
     }
 
     render() {
-        const {
-            isLoadingComplete,
-            isError,
-            errorMessage
-        } = this.state;
+        const { isLoadingComplete, isError, errorMessage } = this.state;
         if (!isLoadingComplete) {
             return <LoadingPage />
         } else if (isError) {
