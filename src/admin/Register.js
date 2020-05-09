@@ -18,7 +18,6 @@ class Register extends React.Component {
             .then(res => {
                 const isFirstInitSystem = res.isFirstInitSystem;
                 this.setState({ isFirstInitSystem: isFirstInitSystem });
-                console.log(isFirstInitSystem)
                 const isRegisterEnabled = isFirstInitSystem ? true : res.systemConfig.isRegisterEnabled;
                 if (isRegisterEnabled) {
                     // Listen to the Firebase Auth state and set the local state.

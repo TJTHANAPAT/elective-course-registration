@@ -12,6 +12,7 @@ import * as system from '../functions/systemFunctions';
 class CourseYearConfig extends React.Component {
     state = {
         isLoadingComplete: false,
+        isSaveFirstInitSystem: false,
         courseYearAdd: '',
     }
     componentDidMount = () => {
@@ -27,6 +28,7 @@ class CourseYearConfig extends React.Component {
             })
             .then(res => {
                 const isFirstInitSystem = res.isFirstInitSystem;
+                this.setState({ isFirstInitSystem: isFirstInitSystem });
                 if (!isFirstInitSystem) {
                     const systemConfig = res.systemConfig;
                     this.setState({
@@ -37,8 +39,8 @@ class CourseYearConfig extends React.Component {
                 } else {
                     console.warn('No course year config has ever been found in database. It will be initialized after saving.')
                     this.setState({
+                        isSaveFirstInitSystem: true,
                         isLoadingComplete: true,
-                        isFirstInitSystem: true,
                         currentCourseYear: '',
                         courseYearsArr: []
                     })
@@ -146,6 +148,7 @@ class CourseYearConfig extends React.Component {
             config = { ...config, ...{ isRegisterEnabled: false } }
             configRef.set(config)
                 .then(() => {
+                    this.setState({isSaveFirstInitSystem:true});
                     console.log('Save successfully!')
                     alert('Save successfully!')
                 })
@@ -234,6 +237,14 @@ class CourseYearConfig extends React.Component {
         } else if (isError) {
             return <ErrorPage errorMessage={errorMessage} btn={'back'} />
         } else {
+            const btnBack = () => {
+                const { isSaveFirstInitSystem } = this.state;
+                if (isSaveFirstInitSystem) {
+                    return <a href="/admin" className="btn btn-secondary ml-2">Back</a>
+                } else {
+                    return <button onClick={this.goBack} className="btn btn-secondary ml-2">Back</button>
+                }
+            }
             return (
                 <div className="body bg-gradient">
                     <div className="wrapper">
@@ -242,7 +253,7 @@ class CourseYearConfig extends React.Component {
                         {this.addNewCourseYearForm()}
                         <div className="mt-2">
                             <button type="submit" className="btn btn-purple" onClick={this.save}>Save</button>
-                            <button onClick={this.goBack} className="btn btn-secondary ml-2">Back</button>
+                            {btnBack()}
                         </div>
                     </div>
                     <Footer />
