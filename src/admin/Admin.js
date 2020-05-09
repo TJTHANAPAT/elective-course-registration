@@ -2,8 +2,11 @@ import React from 'react';
 import LoadingPage from '../components/LoadingPage';
 import Footer from '../components/Footer';
 import ErrorPage from '../components/ErrorPage';
-import CourseManagement from './CourseManagement';
+import SystemManagement from './SystemManagement';
+import Register from './Register';
 import * as auth from './functions/authenticationFuctions';
+import * as system from '../systemFunctions';
+
 
 class Admin extends React.Component {
 
@@ -12,15 +15,33 @@ class Admin extends React.Component {
     }
 
     componentDidMount = () => {
-        auth.checkAuthState(false)
+        system.getSystemConfig(false)
             .then(res => {
-                const user = res.user;
-                const isLogin = res.isLogin;
-                this.setState({
-                    currentUser: user,
-                    isLogin: isLogin,
-                    isLoadindComplete: true
-                })
+                const isFirstInitSystem = res.isFirstInitSystem;
+                console.log(res);
+                this.setState({ isFirstInitSystem: isFirstInitSystem });
+                if (!isFirstInitSystem) {
+                    auth.checkAuthState(false)
+                        .then(res => {
+                            const user = res.user;
+                            const isLogin = res.isLogin;
+                            this.setState({
+                                currentUser: user,
+                                isLogin: isLogin,
+                                isLoadindComplete: true
+                            })
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            this.setState({
+                                isLoadindComplete: true,
+                                isError: true,
+                                errorMessage: err
+                            })
+                        })
+                } else {
+                    this.setState({ isLoadindComplete: true })
+                }
             })
             .catch(err => {
                 console.error(err);
@@ -30,6 +51,7 @@ class Admin extends React.Component {
                     errorMessage: err
                 })
             })
+
     }
 
     updateInput = (event) => {
@@ -80,24 +102,26 @@ class Admin extends React.Component {
                     </div>
                     <input type="password" className="form-control" id="password" placeholder="Password" onChange={updateInput} required />
                 </div>
-                <button type="submit" className="btn btn-wrapper-bottom btn-purple ">Login</button>
+                <button type="submit" className="btn btn-wrapper-bottom btn-purple ">Sign in</button>
             </form>
         )
     }
 
     render() {
-        const { isLoadindComplete, isLogin, isError, errorMessage } = this.state;
+        const { isLoadindComplete, isFirstInitSystem, isLogin, isError, errorMessage } = this.state;
         if (!isLoadindComplete) {
             return <LoadingPage />
         } else if (isError) {
             return <ErrorPage errorMessage={errorMessage} btn={'none'} />
+        } else if (isFirstInitSystem) {
+            return <Register />
         } else if (isLogin) {
-            return <CourseManagement />
+            return <SystemManagement />
         } else {
             return (
                 <div className="body body-center bg-gradient">
                     <div className="wrapper login-form text-left">
-                        <h1>Login</h1>
+                        <h1>Sign In</h1>
                         {this.loginForm()}
                     </div>
                     <Footer />
@@ -105,7 +129,7 @@ class Admin extends React.Component {
             )
         }
     }
-    
+
 }
 
 export default Admin;

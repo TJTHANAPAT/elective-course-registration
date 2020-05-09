@@ -10,7 +10,7 @@ import Admin from './Admin';
 import * as auth from './functions/authenticationFuctions';
 import * as admin from '../systemFunctions';
 
-class CourseManagement extends React.Component {
+class SystemManagement extends React.Component {
     state = {
         courses: [],
 
@@ -199,6 +199,7 @@ class CourseManagement extends React.Component {
                         <div className="wrapper">
                             <h1>Elective Course Enrollment System</h1>
                             <h2>System Management</h2>
+                            <h4>You are signed in as {firebase.auth().currentUser.displayName}.</h4>
                             <label htmlFor="courseyear-selector">Select course year which you want to config:</label>
                             {this.courseYearSelector()}
                             {this.courseDashboard(courses)}
@@ -208,8 +209,9 @@ class CourseManagement extends React.Component {
                             </div>
                             <hr/>
                             <div>
-                                <button className="btn btn-green m-1" onClick={this.signOut}><i className="fa fa-sign-out"></i> Logout</button>
+                                <button className="btn btn-green m-1" onClick={this.signOut}><i className="fa fa-sign-out"></i> Sign out</button>
                                 <a role="button" className="btn btn-green m-1" href="/admin/system/config/year">Config Course Years</a>
+                                <a role="button" className="btn btn-green m-1" href="/admin/registration">Registration</a>
                             </div>
                         </div>
                         <Footer/>
@@ -222,4 +224,4 @@ class CourseManagement extends React.Component {
     }
 }
 
-export default CourseManagement;
+export default SystemManagement;

@@ -5,7 +5,7 @@ class ErrorPage extends React.Component {
     goBack = () => {
         window.history.back();
     }
-    render(){
+    render() {
         const btn = () => {
             if (this.props.btn === 'home') {
                 return <a href="/" className="btn btn-wrapper-bottom btn-green">Home</a>
@@ -15,7 +15,15 @@ class ErrorPage extends React.Component {
                 return <button className="btn btn-wrapper-bottom btn-green" onClick={this.goBack}>Back</button>
             }
         }
-        
+
+        const errorTitle = () => {
+            if (this.props.errorTitle === undefined) {
+                return <h2>Unfortunately, something went wrong.</h2>
+            } else {
+                return <h2>{this.props.errorTitle}</h2>
+            }
+        }
+
         return (
             <div className="body body-center bg-gradient">
                 <div className="wrapper">
@@ -24,13 +32,13 @@ class ErrorPage extends React.Component {
                             <i className="fa fa-exclamation-triangle fa-5x" aria-hidden="false"></i>
                         </div>
                         <div className="col-sm-9 text-left">
-                            <h2>Unfortunately, something went wrong.</h2>
+                            {errorTitle()}
                             <p>{this.props.errorMessage}</p>
                         </div>
                     </div>
                     {btn()}
                 </div>
-                <Footer/>
+                <Footer />
             </div>
         )
     }

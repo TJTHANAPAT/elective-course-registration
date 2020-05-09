@@ -180,7 +180,6 @@ const updatingCourseEnrolled = (courseYear, courseData) => {
 
 const addStudentData = (courseYear, courseData, studentData) => {
     const { studentID } = studentData;
-    const course = courseData;
     const db = firebase.firestore();
     const studentRef = db.collection(courseYear).doc('student').collection('student').doc(studentID);
     return new Promise((resolve, reject) => {
@@ -202,7 +201,7 @@ const addStudentData = (courseYear, courseData, studentData) => {
 export function enrollCourse(courseYear, courseID, studentData) {
     return new Promise((resolve, reject) => {
         const timestamp = firebase.firestore.FieldValue.serverTimestamp();
-        studentData = {...studentData,...{timestamp:timestamp}};
+        studentData = { ...studentData, ...{ timestamp: timestamp } };
         let courseData = null
         validateCourse(courseYear, courseID)
             .then(res => {

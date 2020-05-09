@@ -16,7 +16,7 @@ class CourseYearConfig extends React.Component {
     }
     componentDidMount = () => {
         auth.checkAuthState()
-            .then( res => {
+            .then(res => {
                 const user = res.user;
                 const isLogin = res.isLogin;
                 this.setState({
@@ -25,7 +25,7 @@ class CourseYearConfig extends React.Component {
                 })
                 return system.getSystemConfig(false)
             })
-            .then( res => {
+            .then(res => {
                 const isFirstInitSystem = res.isFirstInitSystem;
                 if (!isFirstInitSystem) {
                     const systemConfig = res.systemConfig;
@@ -44,7 +44,7 @@ class CourseYearConfig extends React.Component {
                     })
                 }
             })
-            .catch( err => {
+            .catch(err => {
                 console.error(err);
                 this.setState({
                     isLoadingComplete: true,
@@ -57,18 +57,18 @@ class CourseYearConfig extends React.Component {
     goBack = () => {
         window.history.back();
     }
-    
+
     updateInput = (event) => {
         this.setState({
-            [event.target.id]:event.target.value
+            [event.target.id]: event.target.value
         })
-        console.log(event.target.id,':',event.target.value)
+        console.log(event.target.id, ':', event.target.value)
     }
 
     addNewCourseYear = (event) => {
         event.preventDefault();
         const { courseYearAdd, courseYearsArr } = this.state
-        if(!system.checkCourseYearExist(courseYearAdd,courseYearsArr)){
+        if (!system.checkCourseYearExist(courseYearAdd, courseYearsArr)) {
             const newCourseYear = {
                 year: courseYearAdd.toString(),
                 available: false,
@@ -84,19 +84,20 @@ class CourseYearConfig extends React.Component {
                 const year = courseYearsArrSortedYear[i];
                 for (let j = 0; j < courseYearsArr.length; j++) {
                     const courseYear = courseYearsArr[j];
-                    if(year === courseYear.year) {
+                    if (year === courseYear.year) {
                         courseYearsArrSorted.push(courseYear);
                     }
                 }
             }
             this.setState({
                 courseYearsArr: courseYearsArrSorted,
-                courseYearAdd:''})
+                courseYearAdd: ''
+            })
             console.log(courseYearsArrSorted)
         } else {
             alert(`${courseYearAdd} is already exist!`)
         }
-        
+
     }
 
     removeCourseYear = (event) => {
@@ -104,20 +105,20 @@ class CourseYearConfig extends React.Component {
         const { courseYearsArr, currentCourseYear } = this.state;
         const courseYear = event.target.value
         for (let i = 0; i < courseYearsArr.length; i++) {
-            if ( courseYearsArr[i].year === courseYear) {
+            if (courseYearsArr[i].year === courseYear) {
                 courseYearsArr.splice(i, 1);
                 console.log('Remove Course Year', courseYear)
             }
         }
         if (currentCourseYear === courseYear) {
-            this.setState({ currentCourseYear:'' });
+            this.setState({ currentCourseYear: '' });
         }
         this.setState({ courseYearsArr: courseYearsArr });
     }
 
     setCurrentCourseYear = (event) => {
         event.preventDefault();
-        this.setState({ currentCourseYear:event.target.value });
+        this.setState({ currentCourseYear: event.target.value });
     }
 
     save = (event) => {
@@ -125,29 +126,32 @@ class CourseYearConfig extends React.Component {
         const db = firebase.firestore();
         const configRef = db.collection('systemConfig').doc('config')
         const { courseYearsArr, currentCourseYear, isFirstInitSystem } = this.state;
-        const config = {
-            courseYears:courseYearsArr,
-            currentCourseYear:currentCourseYear
+        let config = {
+            courseYears: courseYearsArr,
+            currentCourseYear: currentCourseYear
         }
         if (currentCourseYear === '') {
             alert('You have to set the current course year.');
         } else if (!isFirstInitSystem) {
             configRef.update(config)
                 .then(() => {
-                    console.log('Update successfully!')
-                    alert('Update successfully!')
+                    console.log('Save successfully!')
+                    alert('Save successfully!')
                 })
-                .catch(err => { 
+                .catch(err => {
                     console.error('Error: ', err)
+                    alert('Save failed!')
                 })
         } else {
+            config = { ...config, ...{ isRegisterEnabled: false } }
             configRef.set(config)
                 .then(() => {
                     console.log('Save successfully!')
                     alert('Save successfully!')
                 })
-                .catch(err => { 
+                .catch(err => {
                     console.error('Error: ', err)
+                    alert('Save failed!')
                 })
         }
     }
@@ -198,8 +202,8 @@ class CourseYearConfig extends React.Component {
                     <ul className="list-group admin">{courseYearSelector}</ul>
                     <p className="mt-1">
                         <i>
-                            Warning: Deleting a course year does not delete its course data 
-                            and student data in that course year! 
+                            Warning: Deleting a course year does not delete its course data
+                            and student data in that course year!
                             To do that, you have to delete every course in that course year.
                         </i>
                     </p>
@@ -214,21 +218,21 @@ class CourseYearConfig extends React.Component {
         return (
             <form onSubmit={this.addNewCourseYear} className="form-config row mt-3">
                 <div className="col-9 form-input-inline form-group">
-                    <input type="number" className="form-control" id="courseYearAdd" placeholder="Add new course year" onChange={this.updateInput} value={this.state.courseYearAdd} required/>
+                    <input type="number" className="form-control" id="courseYearAdd" placeholder="Add new course year" onChange={this.updateInput} value={this.state.courseYearAdd} required />
                 </div>
                 <div className="col-3 form-btn-inline">
-                    <button type="submit" className="btn btn-purple full-width">Add</button> 
+                    <button type="submit" className="btn btn-purple full-width">Add</button>
                 </div>
             </form>
         )
     }
 
-    render(){
+    render() {
         const { isLoadingComplete, isError, errorMessage } = this.state;
-        if (!isLoadingComplete){
-            return <LoadingPage/>
+        if (!isLoadingComplete) {
+            return <LoadingPage />
         } else if (isError) {
-            return <ErrorPage errorMessage={errorMessage} btn={'back'}/>
+            return <ErrorPage errorMessage={errorMessage} btn={'back'} />
         } else {
             return (
                 <div className="body bg-gradient">
@@ -241,7 +245,7 @@ class CourseYearConfig extends React.Component {
                             <button onClick={this.goBack} className="btn btn-secondary ml-2">Back</button>
                         </div>
                     </div>
-                    <Footer/>
+                    <Footer />
                 </div>
             )
         }

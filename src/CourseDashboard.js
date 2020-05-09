@@ -159,13 +159,6 @@ class Dashboard extends React.Component {
             })
     } 
 
-    // appendLinkFontAwesome = () => {
-    //     const link = document.createElement('link');
-    //     link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css';
-    //     link.rel = 'stylesheet';
-    //     document.head.appendChild(link);
-    // }
-
     courseDashboard = (coursesData) => {
         const { courseYear } = this.state;
         if (coursesData.length === 0){

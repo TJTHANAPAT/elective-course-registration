@@ -11,12 +11,14 @@ import Enroll from './Enroll';
 import GetStudentData from './GetStudentData';
 
 import Admin from './admin/Admin';
-import CourseManagement from './admin/CourseManagement';
+import SystemManagement from './admin/SystemManagement';
 import CourseYearConfig from './admin/CourseYearConfig';
 import GradeConfig from './admin/GradeConfig';
 import CreateCourse from './admin/CreateCourse';
 import EditCourse from './admin/EditCourse';
 import ViewCourse from './admin/ViewCourse';
+import Register from './admin/Register';
+import Registration from './admin/Registration';
 
 function App() {
   return (
@@ -46,11 +48,17 @@ function App() {
         <Route path='/admin/config/grade'>
           <GradeConfig />
         </Route>
+        <Route path='/admin/registration'>
+          <Registration />
+        </Route>
         <Route path='/admin/course'>
-          <CourseManagement />
+          <SystemManagement />
         </Route>
         <Route path='/admin'>
           <Admin />
+        </Route>
+        <Route path='/register'>
+          <Register />
         </Route>
         <Route path='/'>
           <Homepage />
