@@ -3,7 +3,7 @@ import LoadingPage from '../components/LoadingPage';
 import Footer from '../components/Footer';
 import ErrorPage from '../components/ErrorPage';
 import * as auth from './functions/authenticationFuctions';
-import * as admin from '../systemFunctions';
+import * as system from '../functions/systemFunctions';
 import updateCourse from './functions/updateCourseFunction';
 import deleteCourse from './functions/deleteCourseFunction';
 
@@ -15,17 +15,17 @@ class EditCourse extends React.Component {
     componentDidMount = () => {
         auth.checkAuthState()
             .then(() => {
-                return admin.getURLParam('courseYear')
+                return system.getURLParam('courseYear')
             })
             .then(res => {
                 const courseYear = res;
                 this.setState({ courseYear: courseYear });
-                return admin.getURLParam('courseID');
+                return system.getURLParam('courseID');
             })
             .then(res => {
                 const courseID = res;
                 const { courseYear } = this.state;
-                return admin.getCourseData(courseYear, courseID);
+                return system.getCourseData(courseYear, courseID);
             })
             .then(course => {
                 this.setState({
@@ -35,12 +35,12 @@ class EditCourse extends React.Component {
                     courseTeacher: course.courseTeacher,
                     courseGrade: course.courseGrade,
                 })
-                return admin.getSystemConfig();
+                return system.getSystemConfig();
             })
             .then(res => {
                 const courseYearsArr = res.systemConfig.courseYears;
                 const { courseYear } = this.state;
-                return admin.getCourseYearGrades(courseYear, courseYearsArr);
+                return system.getCourseYearGrades(courseYear, courseYearsArr);
             })
             .then(res => {
                 this.setState({

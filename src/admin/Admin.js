@@ -5,7 +5,7 @@ import ErrorPage from '../components/ErrorPage';
 import SystemManagement from './SystemManagement';
 import Register from './Register';
 import * as auth from './functions/authenticationFuctions';
-import * as system from '../systemFunctions';
+import * as system from '../functions/systemFunctions';
 
 
 class Admin extends React.Component {

@@ -2,8 +2,8 @@ import React from 'react';
 import LoadingPage from './components/LoadingPage';
 import ErrorPage from './components/ErrorPage';
 import Footer from './components/Footer';
-import * as system from './systemFunctions';
-import * as enroll from './enrollCourseFunction';
+import * as system from './functions/systemFunctions';
+import * as enroll from './functions/enrollCourseFunction';
 
 class Enroll extends React.Component {
 

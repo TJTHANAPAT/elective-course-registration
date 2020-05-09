@@ -8,7 +8,7 @@ import ErrorPage from '../components/ErrorPage';
 import Admin from './Admin';
 
 import * as auth from './functions/authenticationFuctions';
-import * as admin from '../systemFunctions';
+import * as admin from '../functions/systemFunctions';
 
 class SystemManagement extends React.Component {
     state = {
