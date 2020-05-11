@@ -19,6 +19,7 @@ import EditCourse from './admin/EditCourse';
 import ViewCourse from './admin/ViewCourse';
 import Register from './admin/Register';
 import Registration from './admin/Registration';
+import ManageStudent from './admin/ManageStudent';
 
 function App() {
   return (
@@ -53,6 +54,9 @@ function App() {
         </Route>
         <Route path='/admin/course'>
           <SystemManagement />
+        </Route>
+        <Route path='/admin/managestudent'>
+          <ManageStudent />
         </Route>
         <Route path='/admin'>
           <Admin />

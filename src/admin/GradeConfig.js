@@ -148,7 +148,7 @@ class GradeConfig extends React.Component {
                         <form onSubmit={this.addNewGrade} className="mt-3">
                             <div className="form-config row">
                                 <div className="col-9 form-input-inline form-group">
-                                    <input type="number" className="form-control" id="gradeAdd" placeholder="Add new grade" onChange={this.updateInput} value={this.state.gradeAdd} required/>
+                                    <input type="number" pattern="[0-9]*" className="form-control" id="gradeAdd" placeholder="Add new grade" onChange={this.updateInput} value={this.state.gradeAdd} required/>
                                 </div>
                                 <div className="col-3 form-btn-inline">
                                     <button type="submit" className="btn btn-purple full-width">Add</button> 

@@ -95,7 +95,7 @@ class CreateCourse extends React.Component {
                         const checkbox = checkboxes[i];
                         checkbox.checked = false;
                     }
-                    alert(`${courseName} (${courseID}) has been created successfully!`);
+                    alert(`${courseName} (${courseID}) in course year ${courseYear} has been created successfully!`);
                 })
                 .catch(err => {
                     console.error(err);

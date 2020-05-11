@@ -2,7 +2,7 @@ import React from 'react';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import * as system from './functions/systemFunctions';
-
+import * as enroll from './functions/enrollCourseFunction'
 import LoadingPage from './components/LoadingPage';
 import ErrorPage from './components/ErrorPage';
 import Footer from './components/Footer';
@@ -22,18 +22,23 @@ class Dashboard extends React.Component {
             .then(res => {
                 const systemConfig = res.systemConfig;
                 const courseYear = systemConfig.currentCourseYear;
-                const courseYearsArr = systemConfig.courseYears;
                 this.setState({
                     courseYear: courseYear,
+                    systemConfig: systemConfig
                 });
-                return system.getCourseYearGrades(courseYear,courseYearsArr)
+                return enroll.checkCourseYearAvailable(courseYear, systemConfig);
             })
-            .then( res => {
+            .then(res => {
+                const { systemConfig, courseYear } = this.state;
+                const courseYearsArr = systemConfig.courseYears;
+                return system.getCourseYearGrades(courseYear, courseYearsArr)
+            })
+            .then(res => {
                 const { courseYear } = this.state;
                 this.setState({ gradesArr: res.grades });
                 this.getCoursesData(courseYear);
             })
-            .catch( err => {
+            .catch(err => {
                 console.error(err);
                 this.setState({
                     isLoadingComplete: true,
@@ -54,8 +59,8 @@ class Dashboard extends React.Component {
                 coursesArr.push(doc.data())
             })
             this.setState({ coursesData: coursesArr });
-            this.filterCoursesDataByGrade(coursesArr,gradeFilter)
-                .then( res => {
+            this.filterCoursesDataByGrade(coursesArr, gradeFilter)
+                .then(res => {
                     const coursesDataFiltered = res;
                     this.setState({
                         courses: coursesDataFiltered,
@@ -66,7 +71,7 @@ class Dashboard extends React.Component {
     }
 
     filterCoursesDataByGrade = (coursesData, grade) => {
-        return new Promise ( resolve => {
+        return new Promise(resolve => {
             let coursesDataFiltered = [];
             if (grade === 'all') {
                 coursesDataFiltered = coursesData
@@ -75,7 +80,7 @@ class Dashboard extends React.Component {
                     const course = coursesData[i];
                     for (let j = 0; j < course.courseGrade.length; j++) {
                         const courseGrade = course.courseGrade[j];
-                        if ( courseGrade === grade || courseGrade === parseInt(grade) ) {
+                        if (courseGrade === grade || courseGrade === parseInt(grade)) {
                             coursesDataFiltered.push(course);
                         }
                     }
@@ -83,7 +88,7 @@ class Dashboard extends React.Component {
             }
             resolve(coursesDataFiltered);
         })
-        
+
     }
 
     handleChangeFilter = (event) => {
@@ -97,11 +102,11 @@ class Dashboard extends React.Component {
                     gradeFilter: gradeFilter
                 });
             })
-    } 
+    }
 
     courseDashboard = (coursesData) => {
         const { courseYear } = this.state;
-        if (coursesData.length === 0){
+        if (coursesData.length === 0) {
             return (
                 <div className="mt-4 text-center">
                     <p>Sorry, it is empty.</p>
@@ -130,7 +135,7 @@ class Dashboard extends React.Component {
                                 <div className="detail col-sm-6">
                                     <span className="course-name">{course.courseID} {course.courseName}</span>
                                     <span><i className="fa fa-fw fa-user" aria-hidden="true"></i> {course.courseTeacher}</span>
-                                    <span><i className="fa fa-fw fa-check-square-o" aria-hidden="true"></i> Grade {course.courseGrade.join(', ')} students</span> 
+                                    <span><i className="fa fa-fw fa-check-square-o" aria-hidden="true"></i> Grade {course.courseGrade.join(', ')} students</span>
                                 </div>
                                 <div className="col-sm-6">
                                     <div className="row align-items-center">
@@ -148,9 +153,9 @@ class Dashboard extends React.Component {
                                         </div>
                                     </div>
                                 </div>
-                                
+
                             </div>
-                            
+
                         </div>
                         <div className="course-btn col-md-2">
                             {btnEnroll()}
@@ -162,12 +167,12 @@ class Dashboard extends React.Component {
         }
     }
 
-    render(){
+    render() {
         const { isLoadingComplete, isError, errorMessage } = this.state;
-        if(!isLoadingComplete){
-            return <LoadingPage/>
-        } else if (isError){
-            return <ErrorPage errorMessage={errorMessage} btn={'home'}/>
+        if (!isLoadingComplete) {
+            return <LoadingPage />
+        } else if (isError) {
+            return <ErrorPage errorMessage={errorMessage} btn={'home'} />
         } else {
             const { courses, courseYear, gradesArr } = this.state;
             const courseDashboard = this.courseDashboard;
@@ -179,17 +184,17 @@ class Dashboard extends React.Component {
                         <label htmlFor="grade-filter">Filter courses by grade:</label>
                         <select id="grade-filter" className="form-control" defaultValue="all" onChange={this.handleChangeFilter}>
                             <option value="all">All</option>
-                            {gradesArr.map((grade, i) => {return( <option value={grade} key={i}>Grade {grade}</option> )})}
+                            {gradesArr.map((grade, i) => { return (<option value={grade} key={i}>Grade {grade}</option>) })}
                         </select>
                         {courseDashboard(courses)}
                         <a href="/" className="btn btn-wrapper-bottom btn-green">Home</a>
                     </div>
-                    <Footer/>
+                    <Footer />
                 </div>
             )
         }
 
-        
+
     }
 }
 

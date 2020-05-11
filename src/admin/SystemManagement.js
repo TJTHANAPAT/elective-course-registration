@@ -206,6 +206,7 @@ class SystemManagement extends React.Component {
                             <div>
                                 <a role="button" className="btn btn-purple m-1" href={`/admin/createcourse?courseYear=${selectedCourseYear}`}>Create New Course</a>
                                 <a role="button" className="btn btn-purple m-1" href={`/admin/config/grade?courseYear=${selectedCourseYear}`}>Config Grade</a>
+                                <a role="button" className="btn btn-purple m-1" href={`/admin/managestudent?courseYear=${selectedCourseYear}`}>Manage Student</a>
                             </div>
                             <hr/>
                             <div>
