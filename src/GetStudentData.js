@@ -26,13 +26,23 @@ class GetStudentData extends React.Component {
         system.getSystemConfig()
             .then(res => {
                 const systemConfig = res.systemConfig;
-                const currentCourseYear = systemConfig.currentCourseYear;
-                const courseYearArr = systemConfig.courseYears;
-                this.setState({
-                    courseYearArr: courseYearArr,
-                    selectedCourseYear: currentCourseYear,
-                    isLoadingComplete: true
-                })
+                const isSearchEnabled = systemConfig.isSearchEnabled;
+                if (isSearchEnabled) {
+                    const currentCourseYear = systemConfig.currentCourseYear;
+                    const courseYearArr = systemConfig.courseYears;
+                    this.setState({
+                        courseYearArr: courseYearArr,
+                        selectedCourseYear: currentCourseYear,
+                        isLoadingComplete: true
+                    })
+                } else {
+                    this.setState({
+                        isLoadingComplete: true,
+                        isError: true,
+                        errorMessage: 'Sorry, searching student data is disabled by admin.'
+                    })
+                }
+
             })
             .catch(err => {
                 console.error(err);

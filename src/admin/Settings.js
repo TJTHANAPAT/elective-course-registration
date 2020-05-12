@@ -10,7 +10,7 @@ import ErrorPage from '../components/ErrorPage';
 import * as auth from './functions/authenticationFuctions';
 import * as system from '../functions/systemFunctions';
 
-class Registration extends React.Component {
+class Settings extends React.Component {
 
     state = {
         isLoadingComplete: false,
@@ -28,6 +28,7 @@ class Registration extends React.Component {
                 const systemConfig = res.systemConfig;
                 this.setState({
                     isRegisterEnabled: systemConfig.isRegisterEnabled,
+                    isSearchEnabled: systemConfig.isSearchEnabled,
                     isLoadingComplete: true
                 })
             })
@@ -45,24 +46,21 @@ class Registration extends React.Component {
         window.history.back();
     }
 
-    updateInput = (event) => {
-        this.setState({
-            [event.target.id]: event.target.value
-        })
-        console.log(event.target.id, ':', event.target.value)
-    }
-
-    handleChangeEnableBtn = (checked, event) => {
+    handleChangeEnableBtn = (checked, event, id) => {
         event.preventDefault();
-        this.setState({ isRegisterEnabled: checked });
+        console.log(id, checked);
+        this.setState({ [id]: checked });
     }
 
     save = (event) => {
         event.preventDefault();
         const db = firebase.firestore();
         const configRef = db.collection('systemConfig').doc('config')
-        const { isRegisterEnabled } = this.state;
-        let config = { isRegisterEnabled: isRegisterEnabled }
+        const { isRegisterEnabled, isSearchEnabled } = this.state;
+        let config = {
+            isRegisterEnabled: isRegisterEnabled,
+            isSearchEnabled: isSearchEnabled
+        }
         configRef.update(config)
             .then(() => {
                 console.log('Save successfully!')
@@ -82,12 +80,12 @@ class Registration extends React.Component {
         } else if (isError) {
             return <ErrorPage errorMessage={errorMessage} btn={'back'} />
         } else {
-            const { isRegisterEnabled } = this.state;
+            const { isRegisterEnabled, isSearchEnabled } = this.state;
             return (
                 <div className="body bg-gradient">
                     <div className="wrapper text-left">
                         <h1>Elective Course Enrollment System</h1>
-                        <h2>Registration</h2>
+                        <h2>Settings</h2>
                         <ul className="list-group admin mt-3 mb-3">
                             <li className="list-group-item">
                                 <div className="list-item-text">
@@ -95,8 +93,21 @@ class Registration extends React.Component {
                                 </div>
                                 <div className="list-item-action-panel">
                                     <Switch
+                                        id={'isRegisterEnabled'}
                                         onChange={this.handleChangeEnableBtn}
                                         checked={isRegisterEnabled}
+                                    />
+                                </div>
+                            </li>
+                            <li className="list-group-item">
+                                <div className="list-item-text">
+                                    <span>Enable Search Student Data</span>
+                                </div>
+                                <div className="list-item-action-panel">
+                                    <Switch
+                                        id={'isSearchEnabled'}
+                                        onChange={this.handleChangeEnableBtn}
+                                        checked={isSearchEnabled}
                                     />
                                 </div>
                             </li>
@@ -111,7 +122,7 @@ class Registration extends React.Component {
             )
         }
     }
-    
+
 }
 
-export default Registration;
+export default Settings;

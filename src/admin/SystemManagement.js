@@ -212,7 +212,7 @@ class SystemManagement extends React.Component {
                             <div>
                                 <button className="btn btn-green m-1" onClick={this.signOut}><i className="fa fa-sign-out"></i> Sign out</button>
                                 <a role="button" className="btn btn-green m-1" href="/admin/system/config/year">Config Course Years</a>
-                                <a role="button" className="btn btn-green m-1" href="/admin/registration">Registration</a>
+                                <a role="button" className="btn btn-green m-1" href="/admin/settings">Settings</a>
                             </div>
                         </div>
                         <Footer/>

@@ -18,7 +18,7 @@ import CreateCourse from './admin/CreateCourse';
 import EditCourse from './admin/EditCourse';
 import ViewCourse from './admin/ViewCourse';
 import Register from './admin/Register';
-import Registration from './admin/Registration';
+import Settings from './admin/Settings';
 import ManageStudent from './admin/ManageStudent';
 
 function App() {
@@ -49,8 +49,8 @@ function App() {
         <Route path='/admin/config/grade'>
           <GradeConfig />
         </Route>
-        <Route path='/admin/registration'>
-          <Registration />
+        <Route path='/admin/settings'>
+          <Settings />
         </Route>
         <Route path='/admin/course'>
           <SystemManagement />

@@ -148,10 +148,10 @@ class CourseYearConfig extends React.Component {
                     alert('Save failed!')
                 })
         } else {
-            config = { ...config, ...{ isRegisterEnabled: false } }
+            config = { ...config, ...{ isRegisterEnabled: false, isSearchEnabled: true } }
             configRef.set(config)
                 .then(() => {
-                    this.setState({isSaveFirstInitSystem:true});
+                    this.setState({ isSaveFirstInitSystem: true });
                     console.log('Save successfully!')
                     alert('Save successfully!')
                 })
