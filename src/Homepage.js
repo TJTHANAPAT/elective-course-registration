@@ -8,7 +8,7 @@ class Homepage extends React.Component {
                 <div className="wrapper-no-bg-color">
                     <h1>Elective Course Enrollment System</h1>
                     <div className="mt-3">
-                        <a className="btn btn-landing m-2" href="/course">Enroll in a Course</a>
+                        <a className="btn btn-landing m-2" href="/course">Enroll</a>
                         <a className="btn btn-landing m-2" href="/search">Search</a>
                     </div>
                 </div>

@@ -165,7 +165,7 @@ class Enroll extends React.Component {
                 </div>
                 <div className="form-check">
                     <input type="checkbox" className="form-check-input" id="chkConfirm" required />
-                    <label className="form-check-label" htmlFor="chkConfirm">Confirm</label>
+                    <label className="form-check-label" htmlFor="chkConfirm">Confirm that my inputs above are complete and correct.</label>
                 </div>
                 <br />
                 <button type="submit" className="btn btn-purple">Enroll</button>
