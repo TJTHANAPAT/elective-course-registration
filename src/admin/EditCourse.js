@@ -133,7 +133,7 @@ class EditCourse extends React.Component {
 
                 <div className="form-group">
                     <label htmlFor="courseCapacity">Course Capacity</label>
-                    <input type="number" className="form-control" id="courseCapacity" placeholder="Course Capacity" onChange={this.updateInput} value={this.state.courseCapacity} required />
+                    <input type="number" pattern="[0-9]*" className="form-control" id="courseCapacity" placeholder="Course Capacity" onChange={this.updateInput} value={this.state.courseCapacity} required />
                 </div>
 
                 <button type="submit" className="btn btn-purple">Save</button>
@@ -340,8 +340,7 @@ class EditCourse extends React.Component {
             return (
                 <div className="body bg-gradient">
                     <div className="wrapper">
-                        <h1>Elective Course Enrollment System</h1>
-                        <h2>Edit Course</h2>
+                        <h1>Edit Course {courseID}</h1>
                         <p>Editing course {courseID} in course year {courseYear}.</p>
                         {this.UpdateCourseForm()}
                     </div>

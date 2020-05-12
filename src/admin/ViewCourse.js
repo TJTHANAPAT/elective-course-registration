@@ -224,9 +224,8 @@ class ViewCourse extends React.Component {
             return (
                 <div className="body bg-gradient">
                     <div className="wrapper">
-                        <h1>Elective Course Enrollment System</h1>
-                        <h2>{courseName} ({courseID})</h2>
-                        <p>Course {courseName} ({courseID}) in course year {courseYear}</p>
+                        <h1>{courseName} ({courseID})</h1>
+                        <p>Course {courseName} ({courseID}) in course year {courseYear}.</p>
                         {this.studentsList()}
                         <button className="btn btn-wrapper-bottom btn-green" onClick={this.goBack}>Back</button>
                     </div>

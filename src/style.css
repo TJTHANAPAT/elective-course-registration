@@ -76,6 +76,15 @@ footer {
   font-size: 20px;
   font-weight: 500;
 }
+.course .course-teacher {
+  line-height: 1.3;
+  margin-top: 5px;
+}
+.course .course-grade {
+  line-height: 1.3;
+  margin-top: 3px;
+}
+
 .course .stat {
   margin: 0 !important;
   padding: 10px 0 !important;

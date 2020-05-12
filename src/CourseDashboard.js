@@ -147,8 +147,8 @@ class Dashboard extends React.Component {
                             <div className="row align-items-center">
                                 <div className="detail col-sm-6">
                                     <span className="course-name">{course.courseID} {course.courseName}</span>
-                                    <span><i className="fa fa-fw fa-user" aria-hidden="true"></i> {course.courseTeacher}</span>
-                                    <span><i className="fa fa-fw fa-check-square-o" aria-hidden="true"></i> Grade {course.courseGrade.join(', ')} students</span>
+                                    <span className="course-teacher"><i className="fa fa-fw fa-user" aria-hidden="true"></i> {course.courseTeacher}</span>
+                                    <span className="course-grade"><i className="fa fa-fw fa-check-square-o" aria-hidden="true"></i> Grade {course.courseGrade.join(', ')} students</span>
                                 </div>
                                 <div className="col-sm-6">
                                     <div className="row align-items-center">
