@@ -84,8 +84,7 @@ class Settings extends React.Component {
             return (
                 <div className="body bg-gradient">
                     <div className="wrapper text-left">
-                        <h1>Elective Course Enrollment System</h1>
-                        <h2>Settings</h2>
+                        <h1>Settings</h1>
                         <ul className="list-group admin mt-3 mb-3">
                             <li className="list-group-item">
                                 <div className="list-item-text">

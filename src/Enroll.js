@@ -56,7 +56,8 @@ class Enroll extends React.Component {
 
     }
 
-    goBack = () => {
+    goBack = (event) => {
+        event.preventDefault();
         window.history.back();
     }
 
@@ -195,8 +196,8 @@ class Enroll extends React.Component {
                         </div>
                         <div className="col-sm-9 text-left">
                             <h1>Your enrollment is completed!</h1>
-                            <p>{nameTitle} {nameFirst} {nameLast} (student ID: {studentID})
-                            has enrolled to the {courseName} ({courseID}) in course year {courseYear} successfully!</p>
+                            <p><b>{nameTitle} {nameFirst} {nameLast}</b> (student ID: {studentID})
+                            has enrolled to the <i>{courseName} ({courseID})</i> in course year {courseYear} successfully!</p>
                         </div>
                     </div>
                     <a className="btn btn-wrapper-bottom btn-green" href="/">Home</a>

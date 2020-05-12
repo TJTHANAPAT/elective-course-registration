@@ -142,8 +142,7 @@ class GradeConfig extends React.Component {
             return (
                 <div className="body bg-gradient">
                     <div className="wrapper text-left">
-                        <h1>Elective Course Enrollment System</h1>
-                        <h2>Grade Configuration</h2>
+                        <h1>Grade Configuration</h1>
                         <p>Configure grade of course year {courseYear}.</p>
                         {this.gradeList()}
                         <form onSubmit={this.addNewGrade} className="mt-3">

@@ -203,9 +203,8 @@ class CreateCourse extends React.Component {
             return (
                 <div className="body bg-gradient">
                     <div className="wrapper">
-                        <h1>Elective Course Enrollment System</h1>
-                        <h2>Create Course</h2>
-                        <p>Creating a course for course year {courseYear}.</p>
+                        <h1>Create New Course</h1>
+                        <p>Creating a new course for course year {courseYear}.</p>
                         {this.createCourseForm()}
                     </div>
                     <Footer />

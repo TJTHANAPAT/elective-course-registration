@@ -251,7 +251,7 @@ class CourseYearConfig extends React.Component {
             return (
                 <div className="body bg-gradient">
                     <div className="wrapper">
-                        <h1>Course Years Configuration</h1>
+                        <h1>Course Year Configuration</h1>
                         {this.courseYearsList()}
                         {this.addNewCourseYearForm()}
                         <div className="mt-2">
