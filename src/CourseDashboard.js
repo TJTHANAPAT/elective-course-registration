@@ -36,7 +36,19 @@ class Dashboard extends React.Component {
             .then(res => {
                 const { courseYear } = this.state;
                 this.setState({ gradesArr: res.grades });
-                this.getCoursesData(courseYear);
+                return this.getCoursesData(courseYear);
+            })
+            .then(res => {
+                const coursesData = res;
+                this.setState({ coursesData: coursesData });
+                return this.filterCoursesDataByGrade(coursesData, 'all');
+            })
+            .then(res => {
+                const coursesDataFiltered = res;
+                this.setState({
+                    courses: coursesDataFiltered,
+                    isLoadingComplete: true
+                });
             })
             .catch(err => {
                 console.error(err);
@@ -51,23 +63,24 @@ class Dashboard extends React.Component {
     getCoursesData = (courseYear) => {
         const db = firebase.firestore();
         const courseRef = db.collection(courseYear).doc('course').collection('course');
-        const { gradeFilter } = this.state;
-        let coursesArr = [];
-        courseRef.onSnapshot(querySnapshot => {
-            coursesArr = [];
-            querySnapshot.forEach(doc => {
-                coursesArr.push(doc.data())
-            })
-            this.setState({ coursesData: coursesArr });
-            this.filterCoursesDataByGrade(coursesArr, gradeFilter)
-                .then(res => {
-                    const coursesDataFiltered = res;
-                    this.setState({
-                        courses: coursesDataFiltered,
-                        isLoadingComplete: true
+        return new Promise((resolve, reject) => {
+            courseRef.get()
+                .then(snapshot => {
+                    if (snapshot.empty) {
+                        const err = `No course in course year ${courseYear} has been found in database.`
+                        reject(err);
+                    }
+                    let coursesArr = [];
+                    snapshot.forEach(doc => {
+                        coursesArr.push(doc.data());
                     });
+                    resolve(coursesArr);
                 })
-        });
+                .catch(err => {
+                    const errorMessage = `Error getting courses data in course year ${courseYear} from database. ${err.message}`;
+                    reject(errorMessage);
+                });
+        })
     }
 
     filterCoursesDataByGrade = (coursesData, grade) => {
@@ -153,9 +166,7 @@ class Dashboard extends React.Component {
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
-
                         </div>
                         <div className="course-btn col-md-2">
                             {btnEnroll()}

@@ -28,7 +28,7 @@ export function checkCourseAvailable(courseYear = '', courseData = {}) {
         if (courseEnrolled < courseCapacity) {
             resolve();
         } else {
-            const err = `Course ${courseID} in course year ${courseYear} has reached its capacity, therefore it is not available to enroll.`
+            const err = `Course ${courseID} in course year ${courseYear} has reached its capacity. Therefore, it is not available to enroll.`
             reject(err);
         }
     })
