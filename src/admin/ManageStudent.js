@@ -50,7 +50,8 @@ class ManageStudent extends React.Component {
             })
     }
 
-    goBack = () => {
+    goBack = (event) => {
+        event.preventDefault();
         window.history.back();
     }
 
@@ -62,17 +63,19 @@ class ManageStudent extends React.Component {
 
     saveStudentData = (event) => {
         event.preventDefault();
-        console.log(this.state.studentData);
+        this.setState({ isLoadingComplete: false });
         const courseYear = this.state.lastSearchCourseYear;
-        const {studentData} = this.state;
+        const { studentData } = this.state;
         const studentID = studentData.studentID
         const db = firebase.firestore();
         const studentRef = db.collection(courseYear).doc('student').collection('student').doc(studentID);
         studentRef.update(studentData)
             .then(() => {
+                this.setState({ isLoadingComplete: true });
                 alert('Update student data successfully!');
             })
             .catch(err => {
+                this.setState({ isLoadingComplete: true });
                 alert('Failed updating student data.');
                 console.error(err);
             })
@@ -81,42 +84,42 @@ class ManageStudent extends React.Component {
     deleteStudentData = (event) => {
         event.preventDefault();
         const courseYear = this.state.lastSearchCourseYear;
-        const {studentData} = this.state;
-        const {studentID,enrolledCourse} = studentData
+        const { studentData } = this.state;
+        const { studentID, enrolledCourse } = studentData
         console.log('Delete Student Data.')
         const db = firebase.firestore();
         const studentRef = db.collection(courseYear).doc('student').collection('student').doc(studentID);
         const courseRef = db.collection(courseYear).doc('course').collection('course').doc(enrolledCourse);
         const confirmDelete = window.confirm('Are you sure to delete this student?');
         if (confirmDelete) {
-            this.setState({isLoadingComplete:false});
+            this.setState({ isLoadingComplete: false });
             studentRef.delete()
-                .then(()=>{
+                .then(() => {
                     courseRef.get()
-                        .then(doc=>{
+                        .then(doc => {
                             const courseEnrolled = doc.data().courseEnrolled;
                             const updateCourseEnrolled = courseEnrolled - 1;
                             courseRef.update({ courseEnrolled: updateCourseEnrolled })
-                            .then(()=> {
-                                this.setState({isLoadingComplete:true});
-                                alert('Student has been deleted successfully!')
-                                window.location.reload();
-                            })
-                            .catch(err=>{
-                                console.log(err);
-                                alert('Failed deleting student data.')
-                            })
+                                .then(() => {
+                                    this.setState({ isLoadingComplete: true });
+                                    alert('Student has been deleted successfully!')
+                                    window.location.reload();
+                                })
+                                .catch(err => {
+                                    console.log(err);
+                                    alert('Failed deleting student data.')
+                                })
                         })
-                        .catch(err=>{
+                        .catch(err => {
                             console.log(err);
                             alert('Failed deleting student data.')
                         })
                 })
-                .catch(err=>{
+                .catch(err => {
                     console.log(err);
                     alert('Failed deleting student data.')
                 })
-            
+
         }
 
     }
@@ -177,7 +180,7 @@ class ManageStudent extends React.Component {
                                     studentRoll: studentRoll,
                                     enrolledCourse: enrolledCourse,
                                     courseName: courseName,
-                                    timestamp: new Date(timestamp.seconds * 1000).toLocaleString()
+                                    timestamp: timestamp
                                 }
                                 this.setState({
                                     studentID: studentID,
@@ -223,7 +226,7 @@ class ManageStudent extends React.Component {
         if (isLoadingData) {
             return <p><i className="fa fa-circle-o-notch fa-spin fa-fw"></i> Loading...</p>
         } else if (isGetDataComplete && isDataExists) {
-            const {lastSearchCourseYear} = this.state;
+            const { lastSearchCourseYear } = this.state;
             const {
                 nameTitle,
                 nameFirst,
@@ -280,7 +283,7 @@ class ManageStudent extends React.Component {
                         <div className="form-group">
                             <label htmlFor="nameLast">Enrolled Course</label>
                             <input type="text" className="form-control" value={`${enrolledCourse} ${courseName}`} disabled />
-                            <p><i>Enrolled since {timestamp}</i></p>
+                            <p><i>Enrolled since {new Date(timestamp.seconds * 1000).toLocaleString()}</i></p>
                         </div>
                         <div>
                             <button type="submit" className="btn btn-purple m-1">Save</button>

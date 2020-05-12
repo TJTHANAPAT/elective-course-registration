@@ -181,6 +181,7 @@ class Dashboard extends React.Component {
                     <div className="wrapper">
                         <h1>Elective Course Enrollment System</h1>
                         <h2>Course Year {courseYear}</h2>
+                        <p>Select available course you would like to enroll.</p>
                         <label htmlFor="grade-filter">Filter courses by grade:</label>
                         <select id="grade-filter" className="form-control" defaultValue="all" onChange={this.handleChangeFilter}>
                             <option value="all">All</option>

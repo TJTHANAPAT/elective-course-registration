@@ -50,7 +50,8 @@ class CreateCourse extends React.Component {
             })
     }
 
-    goBack = () => {
+    goBack = (event) => {
+        event.preventDefault();
         window.history.back();
     }
 
@@ -184,7 +185,7 @@ class CreateCourse extends React.Component {
                 </div>
                 <div className="form-group">
                     <label htmlFor="courseCapacity">Course Capacity</label>
-                    <input type="number" className="form-control" id="courseCapacity" placeholder="Course Capacity" onChange={this.updateInput} value={this.state.courseCapacity} required />
+                    <input type="number" pattern="[0-9]*" className="form-control" id="courseCapacity" placeholder="Course Capacity" onChange={this.updateInput} value={this.state.courseCapacity} required />
                 </div>
                 <button type="submit" className="btn btn-purple">Create</button> <button onClick={this.goBack} className="btn btn-secondary">Back</button>
             </form>

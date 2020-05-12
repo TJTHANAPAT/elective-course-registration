@@ -44,7 +44,8 @@ class GetStudentData extends React.Component {
             })
     }
 
-    goBack = () => {
+    goBack = (event) => {
+        event.preventDefault();
         window.history.back();
     }
 

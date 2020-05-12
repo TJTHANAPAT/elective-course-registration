@@ -56,7 +56,8 @@ class CourseYearConfig extends React.Component {
             })
     }
 
-    goBack = () => {
+    goBack = (event) => {
+        event.preventDefault();
         window.history.back();
     }
 
@@ -70,7 +71,9 @@ class CourseYearConfig extends React.Component {
     addNewCourseYear = (event) => {
         event.preventDefault();
         const { courseYearAdd, courseYearsArr } = this.state
-        if (!system.checkCourseYearExist(courseYearAdd, courseYearsArr)) {
+        if (courseYearAdd.includes('/')) {
+            alert(`Course year must not contain slash ( / ).`)
+        } else if (!system.checkCourseYearExist(courseYearAdd, courseYearsArr)) {
             const newCourseYear = {
                 year: courseYearAdd.toString(),
                 available: false,
@@ -221,7 +224,7 @@ class CourseYearConfig extends React.Component {
         return (
             <form onSubmit={this.addNewCourseYear} className="form-config row mt-3">
                 <div className="col-9 form-input-inline form-group">
-                    <input type="number" className="form-control" id="courseYearAdd" placeholder="Add new course year" onChange={this.updateInput} value={this.state.courseYearAdd} required />
+                    <input type="text" className="form-control" id="courseYearAdd" placeholder="Add new course year" onChange={this.updateInput} value={this.state.courseYearAdd} required />
                 </div>
                 <div className="col-3 form-btn-inline">
                     <button type="submit" className="btn btn-purple full-width">Add</button>
