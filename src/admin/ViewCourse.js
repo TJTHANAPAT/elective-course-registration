@@ -5,28 +5,37 @@ import LoadingPage from '../components/LoadingPage';
 import Footer from '../components/Footer';
 import ErrorPage from '../components/ErrorPage';
 
+import * as auth from './functions/authenticationFuctions';
+import * as system from '../functions/systemFunctions';
+
 class ViewCourse extends React.Component {
     state = {
-        courseName:'',
-        courseID:'',
-        courseCapacity:'',
-        courseTeacher:'',
-        courseGrade:[],
-        gradesArr:[],
-        isLoadingComplete:false,
-        studentsArr:[]
+        courseName: '',
+        courseID: '',
+        courseCapacity: '',
+        courseTeacher: '',
+        courseGrade: [],
+        gradesArr: [],
+        isLoadingComplete: false,
+        studentsArr: []
     }
 
     componentDidMount = () => {
-
-        this.getURLParams()
-            .then( res => {
-                const courseYear = res.courseYear;
-                const courseID = res.courseID
-                this.setState({ courseYear:courseYear, courseID: courseID });
-                return this.getCourseData(courseYear, courseID);
+        auth.checkAuthState()
+            .then(() => {
+                return system.getURLParam('courseYear')
             })
-            .then( course => {
+            .then(res => {
+                const courseYear = res;
+                this.setState({ courseYear: courseYear });
+                return system.getURLParam('courseID');
+            })
+            .then(res => {
+                const courseID = res;
+                const { courseYear } = this.state;
+                return system.getCourseData(courseYear, courseID);
+            })
+            .then(course => {
                 this.setState({
                     courseName: course.courseName,
                     courseID: course.courseID,
@@ -37,13 +46,13 @@ class ViewCourse extends React.Component {
                 const { courseYear, courseID } = this.state;
                 return this.getCourseStudentsData(courseYear, courseID);
             })
-            .then( res => {
+            .then(res => {
                 this.setState({
                     studentsArr: res,
                     isLoadingComplete: true
                 })
             })
-            .catch( err => {
+            .catch(err => {
                 console.error(err);
                 this.setState({
                     isLoadingComplete: true,
@@ -53,17 +62,22 @@ class ViewCourse extends React.Component {
             })
     }
 
+    goBack = (event) => {
+        event.preventDefault()
+        window.history.back();
+    }
+
     convertToCSV = (objectArr) => {
         const array = [Object.keys(objectArr[0])].concat(objectArr)
         return array.map(it => {
             return Object.values(it).toString()
         }).join('\n')
     }
-    
+
     exportCSVFile = (objectArr, fileTitle) => {
         var csv = this.convertToCSV(objectArr);
         var exportedFilenmae = fileTitle + '.csv' || 'export.csv';
-    
+
         var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         if (navigator.msSaveBlob) { // IE 10+
             navigator.msSaveBlob(blob, exportedFilenmae);
@@ -100,67 +114,21 @@ class ViewCourse extends React.Component {
             studentsArrFormated.push(studentDataFormated);
         })
         this.exportCSVFile(studentsArrFormated, fileTitle);
-    } 
-
-    updateInput = (event) => {
-        this.setState({
-          [event.target.id]: event.target.value
-        });
-    }
-
-    getURLParams = () => {
-        const searchParams = new URLSearchParams(window.location.search);
-        const courseID = searchParams.get('courseID');
-        const courseYear = searchParams.get('courseYear');
-        return new Promise ((resolve, reject) => {
-            const isCourseYearUnfound = courseYear === '' || courseYear === null;
-            const isCourseIDUnfound = courseID === '' || courseID === null;
-            if (isCourseYearUnfound && isCourseIDUnfound) {
-                reject('Not found courseYear and courseID parameters. Please visit homepage and try to enroll again.');
-            } else if (isCourseYearUnfound) {
-                reject('Not found courseYear parameters. Please visit homepage and try to enroll again.');
-            } else if (isCourseIDUnfound ){
-                reject('Not found courseID parameters. Please visit homepage and try to enroll again.');
-            } else {
-                resolve({ courseYear: courseYear, courseID: courseID})
-            }
-        })
-    }
-
-    getCourseData = (courseYear, courseID) => {
-        const db = firebase.firestore();
-        const courseRef = db.collection(courseYear).doc('course').collection('course').doc(courseID)
-        return new Promise((resolve, reject) => {
-            courseRef.get()
-                .then( doc => {
-                    if (doc.exists) {
-                        resolve(doc.data());
-                    } else {
-                        const err = `Course ${courseID} in ${courseYear} has not been found in database.`
-                        reject(err);
-                    }
-                })
-                .catch( err => { 
-                    const errorMessage = `Firebase failed getting course data of course ${courseID} in ${courseYear}.`;
-                    reject(errorMessage);
-                    console.error(err);
-                })
-        })
     }
 
     getCourseStudentsData = (courseYear, courseID) => {
         const db = firebase.firestore();
-        const studentRef = db.collection(courseYear).doc('student').collection('student').where('enrolledCourse','==',courseID);
-        return new Promise ((resolve, reject) => {
+        const studentRef = db.collection(courseYear).doc('student').collection('student').where('enrolledCourse', '==', courseID);
+        return new Promise((resolve, reject) => {
             studentRef.get()
-                .then( querySnapshot => {
+                .then(querySnapshot => {
                     let studentsArr = [];
-                    querySnapshot.forEach(function(doc) {
+                    querySnapshot.forEach(function (doc) {
                         studentsArr.push(doc.data());
                     });
                     resolve(studentsArr);
                 })
-                .catch( err => {
+                .catch(err => {
                     console.error(err);
                     const errorMessage = `Firebase failed getting student data of course ${courseID} in ${courseYear}. (${err.errorMessage})`
                     reject(errorMessage)
@@ -169,7 +137,7 @@ class ViewCourse extends React.Component {
     }
 
     studentsList = () => {
-        const {studentsArr} = this.state
+        const { studentsArr } = this.state
         if (studentsArr.length === 0) {
             return <p className="text-center">No students has enrolled in this course.</p>
         } else {
@@ -204,21 +172,17 @@ class ViewCourse extends React.Component {
                     </table>
                     <button className="btn btn-purple" onClick={this.exportStudentList}><i className="fa fa-download fa-fw"></i> Export to CSV File</button>
                 </div>
-                
+
             )
         }
     }
 
-    goBack = () => {
-        window.history.back();
-    }
-
-    render(){
+    render() {
         const { isLoadingComplete, isError, errorMessage } = this.state;
         if (!isLoadingComplete) {
-            return <LoadingPage/>
+            return <LoadingPage />
         } else if (isError) {
-            return <ErrorPage errorMessage={errorMessage} btn={'back'}/>
+            return <ErrorPage errorMessage={errorMessage} btn={'back'} />
         } else {
             const { courseID, courseName, courseYear } = this.state
             return (
@@ -229,7 +193,7 @@ class ViewCourse extends React.Component {
                         {this.studentsList()}
                         <button className="btn btn-wrapper-bottom btn-green" onClick={this.goBack}>Back</button>
                     </div>
-                    <Footer/>
+                    <Footer />
                 </div>
             )
         }

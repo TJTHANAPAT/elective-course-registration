@@ -8,7 +8,7 @@ import ErrorPage from '../components/ErrorPage';
 import Admin from './Admin';
 
 import * as auth from './functions/authenticationFuctions';
-import * as admin from '../functions/systemFunctions';
+import * as system from '../functions/systemFunctions';
 
 class SystemManagement extends React.Component {
     state = {
@@ -32,7 +32,7 @@ class SystemManagement extends React.Component {
                     currentUser: user,
                     isLogin: isLogin,
                 })
-                return admin.getSystemConfig(false)
+                return system.getSystemConfig(false)
             })
             .then( res => {
                 const isFirstInitSystem = res.isFirstInitSystem;
